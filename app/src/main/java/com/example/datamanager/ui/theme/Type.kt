@@ -1,4 +1,4 @@
-package com.example.datamanager.ui.theme
+package com.example.datamanager.theme
 
 import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle

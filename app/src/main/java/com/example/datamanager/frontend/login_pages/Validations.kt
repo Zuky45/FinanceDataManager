@@ -1,4 +1,4 @@
-package com.example.datamanager.login_pages
+package com.example.datamanager.frontend.login_pages
 
 import android.util.Patterns
 

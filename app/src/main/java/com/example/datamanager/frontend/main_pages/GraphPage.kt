@@ -1,4 +1,4 @@
-package com.example.datamanager.main_pages
+package com.example.datamanager.frontend.main_pages
 
 import android.graphics.Color as AndroidColor
 import androidx.compose.foundation.background
@@ -26,19 +26,51 @@ import com.github.mikephil.charting.data.LineDataSet
 import org.jetbrains.kotlinx.dataframe.DataFrame
 import java.text.DecimalFormat
 
-// Dark theme color palette
+/**
+ * Color palette for dark theme used throughout the graph page.
+ * Provides consistent colors for various UI elements like backgrounds,
+ * surfaces, text, and accent colors.
+ */
 object DarkThemeColors {
+    /** Main background color for screens (dark gray) */
     val background = Color(0xFF121212)
+
+    /** Surface color for cards and elevated elements (slightly lighter than background) */
     val surface = Color(0xFF1E1E1E)
+
+    /** Alternative surface color for distinguishing sections (lighter than surface) */
     val surfaceVariant = Color(0xFF2D2D2D)
+
+    /** Primary accent color for buttons and interactive elements (blue) */
     val primary = Color(0xFF2196F3)
+
+    /** Secondary accent color for less prominent interactive elements (teal) */
     val secondary = Color(0xFF03DAC6)
+
+    /** Color for text and icons on background */
     val onBackground = Color.White
+
+    /** Color for text and icons on surface */
     val onSurface = Color.White
+
+    /** Color for error states and messages (red) */
     val error = Color(0xFFCF6679)
 }
 
-
+/**
+ * Displays a graph page showing stock data visualization and data table.
+ * This composable manages the complete UI flow including loading states,
+ * error handling, and data presentation.
+ *
+ * @param navController Navigation controller to handle screen transitions
+ * @param stockSymbol Stock ticker symbol to display data for (defaults to "AAPL")
+ * @param viewModel View model that handles business logic and data fetching
+ *
+ * The composable has three main states:
+ * 1. Loading - Shows a loading spinner while data is being fetched
+ * 2. Error - Shows error message with retry button if data fetch fails
+ * 3. Data - Shows chart and data table when data is successfully loaded
+ */
 @Composable
 fun GraphPage(
     navController: NavController,
@@ -107,6 +139,15 @@ fun GraphPage(
     }
 }
 
+/**
+ * Displays a loading indicator with text while data is being fetched.
+ * Centers a progress spinner and loading message on the screen.
+ *
+ * @param stockSymbol The stock symbol being loaded, displayed in the loading message
+ *
+ * Uses CircularProgressIndicator with the primary theme color and displays
+ * a loading message that includes the stock symbol being loaded.
+ */
 @Composable
 private fun LoadingView(stockSymbol: String) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -121,6 +162,16 @@ private fun LoadingView(stockSymbol: String) {
     }
 }
 
+/**
+ * Displays an error message with a retry button when data fetching fails.
+ * Centers the error message and retry button on the screen.
+ *
+ * @param errorMessage The error message to display to the user
+ * @param onRetry Callback function that will be invoked when the user clicks the retry button
+ *
+ * The error message is displayed in the error color from the theme and
+ * includes a retry button that allows users to attempt loading the data again.
+ */
 @Composable
 private fun ErrorView(errorMessage: String, onRetry: () -> Unit) {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -141,6 +192,27 @@ private fun ErrorView(errorMessage: String, onRetry: () -> Unit) {
     }
 }
 
+/**
+ * Displays stock data in a chart and tabular format.
+ * The view is split into two main sections:
+ * 1. A line chart visualization of stock prices over time
+ * 2. A scrollable data table showing detailed time/price information
+ *
+ * @param dataFrame A DataFrame containing stock data with Time and Price columns
+ *
+ * The chart section:
+ * - Uses MPAndroidChart's LineChart to visualize stock price trends
+ * - Implements dark theme styling for the chart
+ * - Configures user interactions like pinch-zoom, drag, and touch
+ * - Draws a cubic Bezier line with shaded area below
+ *
+ * The table section:
+ * - Displays a header row with column names
+ * - Shows time and price data in rows
+ * - Formats price values with a decimal formatter
+ * - Implements scrolling through LazyColumn for large datasets
+ * - Uses dividers between rows for visual separation
+ */
 @Composable
 private fun DataView(dataFrame: DataFrame<StockEntry>) {
     Column(modifier = Modifier.fillMaxSize()) {

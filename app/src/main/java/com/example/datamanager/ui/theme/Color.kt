@@ -1,4 +1,4 @@
-package com.example.datamanager.ui.theme
+package com.example.datamanager.theme
 
 import androidx.compose.ui.graphics.Color
 

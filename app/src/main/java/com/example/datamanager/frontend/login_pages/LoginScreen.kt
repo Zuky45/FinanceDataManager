@@ -1,9 +1,10 @@
-package com.example.datamanager.login_pages
+package com.example.datamanager.frontend.login_pages
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -11,19 +12,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.datamanager.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) {
+fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
     var email by rememberSaveable { mutableStateOf("") }
     var password by rememberSaveable { mutableStateOf("") }
-    var password2 by rememberSaveable { mutableStateOf("") }
-    var passwordVisibility by rememberSaveable { mutableStateOf(false) }
     var isLoading by rememberSaveable { mutableStateOf(false) }
+    var isLoginError by rememberSaveable { mutableStateOf(false) }
+
+
 
     MaterialTheme(colorScheme = customColors) {
         Surface(
@@ -38,7 +39,7 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = stringResource(R.string.create_account),
+                    text = stringResource(R.string.data_manager),
                     style = MaterialTheme.typography.headlineLarge,
                     color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.padding(bottom = 32.dp)
@@ -46,7 +47,10 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
 
                 OutlinedTextField(
                     value = email,
-                    onValueChange = { email = it },
+                    onValueChange = {
+                        email = it
+                        isLoginError = false
+                    },
                     label = { Text(stringResource(R.string.email)) },
                     singleLine = true,
                     isError = email.isNotEmpty() && !isEmailValid(email),
@@ -63,35 +67,20 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
 
                 OutlinedTextField(
                     value = password,
-                    onValueChange = { password = it },
+                    onValueChange = {
+                        password = it
+                        isLoginError = false
+                    },
                     label = { Text(stringResource(R.string.password)) },
                     singleLine = true,
-                    visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-                    isError = password.isNotEmpty() && !passwordsMatches(password, password2),
+                    visualTransformation = PasswordVisualTransformation(),
+                    isError = isLoginError,
                     supportingText = {
-                        if (password2.isNotEmpty() && !passwordsMatches(password, password2)) {
-                            Text(stringResource(R.string.passwords_not_match))
+                        if (isLoginError) {
+                            Text(stringResource(R.string.invalid_credentials))
                         }
                     },
                     leadingIcon = { Icon(Icons.Default.Lock, stringResource(R.string.icon_password)) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(bottom = 16.dp)
-                )
-
-                OutlinedTextField(
-                    value = password2,
-                    onValueChange = { password2 = it },
-                    label = { Text(stringResource(R.string.confirm_password)) },
-                    singleLine = true,
-                    visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-                    isError = password2.isNotEmpty() && !passwordsMatches(password, password2),
-                    supportingText = {
-                        if (password2.isNotEmpty() && !passwordsMatches(password, password2)) {
-                            Text(stringResource(R.string.passwords_not_match))
-                        }
-                    },
-                    leadingIcon = { Icon(Icons.Default.Lock, stringResource(R.string.icon_confirm_password)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 24.dp)
@@ -100,12 +89,17 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
                 Button(
                     onClick = {
                         isLoading = true
+                        if (email == "admin@example.com" && password == "admin") {
+                            navController.navigate("main")
+                        } else {
+                            isLoginError = true
+                            isLoading = false
+                        }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
-                    enabled = isEmailValid(email) && passwordsMatches(password, password2) &&
-                            password.isNotEmpty() && password2.isNotEmpty() && !isLoading,
+                    enabled = isEmailValid(email) && password.isNotEmpty() && !isLoading,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary
@@ -117,28 +111,18 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
                             color = MaterialTheme.colorScheme.onPrimary
                         )
                     } else {
-                        Text(stringResource(R.string.create_account))
+                        Text(stringResource(R.string.login))
                     }
                 }
 
                 TextButton(
-                    onClick = { navController.navigate("login") },
+                    onClick = { navController.navigate("new_account") },
                     modifier = Modifier.padding(top = 16.dp),
                     colors = ButtonDefaults.textButtonColors(
                         contentColor = MaterialTheme.colorScheme.primary
                     )
                 ) {
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            Icons.Default.ArrowBack,
-                            contentDescription = stringResource(R.string.back),
-                            modifier = Modifier.padding(end = 8.dp)
-                        )
-                        Text(stringResource(R.string.back_to_login))
-                    }
+                    Text(stringResource(R.string.create_new_account))
                 }
 
                 AnimatedVisibility(visible = isLoading) {
@@ -153,3 +137,25 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

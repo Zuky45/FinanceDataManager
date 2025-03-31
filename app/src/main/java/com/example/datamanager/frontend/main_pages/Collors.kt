@@ -1,4 +1,4 @@
-package com.example.datamanager.login_pages
+package com.example.datamanager.frontend.main_pages
 
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.ui.graphics.Color
