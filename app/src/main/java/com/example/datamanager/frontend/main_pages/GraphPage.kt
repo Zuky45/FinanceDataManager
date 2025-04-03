@@ -95,24 +95,44 @@ enum class ModelType(val displayName: String) {
  */
 @Composable
 fun GraphPage(
+    // Navigation controller for navigating between screens
     navController: NavController,
+    // Default stock symbol to display
     stockSymbol: String = "AAPL",
+    // ViewModel that handles stock data fetching and processing
     stockViewModel: StockModelHandler = viewModel(),
+    // ViewModel that handles mathematical approximation calculations
     approximationViewModel: ApproximationModelHandler = viewModel()
 ) {
+    // RAW DATA
+
+    // State variables to hold stock data, loading state, and error messages
     val stockData by stockViewModel.stockData.collectAsState()
+    // Loading state and error message for stock data
     val isLoading by stockViewModel.isLoading.collectAsState()
+    // Error message for stock data
     val error by stockViewModel.error.collectAsState()
 
+    // Approximation data
+
+
+    // Loading state and error message for approximation data
     val approximationData by approximationViewModel.approximationData.collectAsState()
+    // Error message for approximation data
     val approxIsLoading by approximationViewModel.isLoading.collectAsState()
+    // Error message for approximation data
     val approxError by approximationViewModel.error.collectAsState()
 
+    // List of available stocks for selection
     val availableStocks = stockViewModel.avaliableActions()
+    // State variables for managing dropdown menus and selected options
     var expandedStockMenu by remember { mutableStateOf(false) }
+    // Selected stock symbol and model type
     var selectedStock by remember { mutableStateOf(stockSymbol) }
+    // Selected model type for data visualization
     var selectedModel by remember { mutableStateOf(ModelType.NONE) }
 
+    // Load stock data when the selected stock changes
     LaunchedEffect(selectedStock) {
         stockViewModel.loadStockData(selectedStock)
         if (selectedModel == ModelType.APPROXIMATION) {
@@ -120,6 +140,7 @@ fun GraphPage(
         }
     }
 
+    // Main layout of the GraphPage
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -159,9 +180,9 @@ fun GraphPage(
                 }
             }
         }
-
+        // Spacer for spacing
         Spacer(modifier = Modifier.height(8.dp))
-
+        // Header text for the graph page
         Text(
             text = "Stock Data for $selectedStock",
             style = MaterialTheme.typography.headlineMedium,
@@ -172,7 +193,7 @@ fun GraphPage(
                 .padding(bottom = 16.dp),
             textAlign = TextAlign.Center
         )
-
+        // Navigation buttons
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -186,11 +207,12 @@ fun GraphPage(
                 Text("Back", color = Color.White)
             }
 
+            // Model type selection dropdown
             if (selectedModel == ModelType.APPROXIMATION) {
-                val degreeOptions = listOf(1, 2, 3, 4, 5)
+                val degreeOptions = listOf(1, 2, 3, 4, 5 ,6 ,7)
                 var expandedDegree by remember { mutableStateOf(false) }
-                var selectedDegree by remember { mutableStateOf(3) }
-
+                var selectedDegree by remember { mutableStateOf(1) }
+                // Degree selection dropdown
                 Box {
                     OutlinedButton(
                         onClick = { expandedDegree = true },
@@ -200,7 +222,7 @@ fun GraphPage(
                     ) {
                         Text("Degree: $selectedDegree")
                     }
-
+                    // Dropdown menu for degree selection
                     DropdownMenu(
                         expanded = expandedDegree,
                         onDismissRequest = { expandedDegree = false }
@@ -221,6 +243,7 @@ fun GraphPage(
             }
         }
 
+        // Model type selection buttons
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -249,6 +272,7 @@ fun GraphPage(
             }
         }
 
+        // Spacer for spacing
         Spacer(modifier = Modifier.height(8.dp))
 
         when {
