@@ -39,7 +39,7 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = stringResource(R.string.data_manager),
+                    text = stringResource(R.string.app_name),
                     style = MaterialTheme.typography.headlineLarge,
                     color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.padding(bottom = 32.dp)
