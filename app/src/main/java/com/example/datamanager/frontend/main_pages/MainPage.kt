@@ -13,16 +13,25 @@ import androidx.navigation.NavController
 import com.example.datamanager.R
 import kotlinx.coroutines.launch
 
+/**
+ * MainPage composable function that displays the main content of the app.
+ * It includes a navigation drawer and a top app bar.
+ *
+ * @param navController The NavController used for navigation between screens.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainPage(navController: NavController) {
+    // State for the drawer
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    // Coroutine scope for launching coroutines
     val scope = rememberCoroutineScope()
+    // State for the selected option in the drawer
     var selectedOption by remember { mutableStateOf("") }
 
-
-
+    // Custom MaterialTheme with custom colors
     MaterialTheme(colorScheme = customColors) {
+        // ModalNavigationDrawer with drawer content
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
@@ -40,6 +49,7 @@ fun MainPage(navController: NavController) {
                     Divider(color = customColors.onSurface.copy(alpha = 0.2f))
                     Spacer(modifier = Modifier.height(8.dp))
 
+                    // Navigation drawer items
                     val chooseData = stringResource(R.string.choose_data)
                     NavigationDrawerItem(
                         icon = { Icon(Icons.Default.DateRange, null) },
@@ -117,6 +127,7 @@ fun MainPage(navController: NavController) {
                 }
             }
         ) {
+            // Scaffold with top app bar and main content
             Scaffold(
                 topBar = {
                     TopAppBar(

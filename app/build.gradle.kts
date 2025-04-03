@@ -156,5 +156,6 @@ android {
         implementation("androidx.navigation:navigation-compose:2.7.6")
         implementation("androidx.compose.ui:ui-tooling-preview:1.5.4")
         debugImplementation("androidx.compose.ui:ui-tooling:1.5.4")
+        implementation("org.apache.commons:commons-math3:3.6.1")
     }
 }

@@ -2,14 +2,17 @@ package com.example.datamanager.frontend.main_pages
 
 import android.graphics.Color as AndroidColor
 import androidx.compose.foundation.background
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -17,74 +20,104 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.datamanager.backend.api_manager.StockEntry
+import com.example.datamanager.mid.ApproximationModelHandler
 import com.example.datamanager.mid.StockModelHandler
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import org.jetbrains.kotlinx.dataframe.DataFrame
 import java.text.DecimalFormat
 
 /**
- * Color palette for dark theme used throughout the graph page.
- * Provides consistent colors for various UI elements like backgrounds,
- * surfaces, text, and accent colors.
+ * Object containing color definitions for the dark theme used throughout the application.
+ * These colors follow Material Design principles and are used consistently across
+ * all UI components to maintain a cohesive visual appearance.
  */
 object DarkThemeColors {
-    /** Main background color for screens (dark gray) */
+    /** Main background color for screens */
     val background = Color(0xFF121212)
 
-    /** Surface color for cards and elevated elements (slightly lighter than background) */
+    /** Surface color for cards and elevated surfaces */
     val surface = Color(0xFF1E1E1E)
 
-    /** Alternative surface color for distinguishing sections (lighter than surface) */
+    /** Variant surface color for headers and differentiation */
     val surfaceVariant = Color(0xFF2D2D2D)
 
-    /** Primary accent color for buttons and interactive elements (blue) */
+    /** Primary brand color for buttons and important UI elements */
     val primary = Color(0xFF2196F3)
 
-    /** Secondary accent color for less prominent interactive elements (teal) */
+    /** Secondary color for less prominent UI elements */
     val secondary = Color(0xFF03DAC6)
 
-    /** Color for text and icons on background */
+    /** Text and icon color on background */
     val onBackground = Color.White
 
-    /** Color for text and icons on surface */
+    /** Text and icon color on surfaces */
     val onSurface = Color.White
 
-    /** Color for error states and messages (red) */
+    /** Error and warning color */
     val error = Color(0xFFCF6679)
 }
 
 /**
- * Displays a graph page showing stock data visualization and data table.
- * This composable manages the complete UI flow including loading states,
- * error handling, and data presentation.
+ * Enum class representing different types of data visualization models.
+ * Used to switch between different representations of stock data.
  *
- * @param navController Navigation controller to handle screen transitions
- * @param stockSymbol Stock ticker symbol to display data for (defaults to "AAPL")
- * @param viewModel View model that handles business logic and data fetching
+ * @property displayName Human-readable name of the model type displayed in the UI.
+ */
+enum class ModelType(val displayName: String) {
+    /** Raw stock data without any modeling applied */
+    NONE("Raw Data"),
+
+    /** Polynomial approximation model of the stock data */
+    APPROXIMATION("Approximation"),
+}
+
+/**
+ * Composable function that displays the stock graph page with interactive features.
+ * This page shows stock price data in graphical and tabular format, and allows
+ * users to switch between different stocks and apply mathematical models to the data.
  *
- * The composable has three main states:
- * 1. Loading - Shows a loading spinner while data is being fetched
- * 2. Error - Shows error message with retry button if data fetch fails
- * 3. Data - Shows chart and data table when data is successfully loaded
+ * The page layout includes:
+ * - Stock selector dropdown
+ * - Navigation controls
+ * - Model type selection
+ * - Interactive graph visualization
+ * - Tabular data display
+ *
+ * @param navController Navigation controller for navigating between screens.
+ * @param stockSymbol The default stock symbol to display. Defaults to "AAPL" (Apple Inc.).
+ * @param stockViewModel ViewModel that handles stock data fetching and processing.
+ * @param approximationViewModel ViewModel that handles mathematical approximation calculations.
  */
 @Composable
 fun GraphPage(
     navController: NavController,
     stockSymbol: String = "AAPL",
-    viewModel: StockModelHandler = viewModel()
+    stockViewModel: StockModelHandler = viewModel(),
+    approximationViewModel: ApproximationModelHandler = viewModel()
 ) {
-    // Collect state from ViewModel
-    val stockData by viewModel.stockData.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val error by viewModel.error.collectAsState()
+    val stockData by stockViewModel.stockData.collectAsState()
+    val isLoading by stockViewModel.isLoading.collectAsState()
+    val error by stockViewModel.error.collectAsState()
 
-    // Load data when the composable is first displayed
-    LaunchedEffect(stockSymbol) {
-        viewModel.loadStockData(stockSymbol)
+    val approximationData by approximationViewModel.approximationData.collectAsState()
+    val approxIsLoading by approximationViewModel.isLoading.collectAsState()
+    val approxError by approximationViewModel.error.collectAsState()
+
+    val availableStocks = stockViewModel.avaliableActions()
+    var expandedStockMenu by remember { mutableStateOf(false) }
+    var selectedStock by remember { mutableStateOf(stockSymbol) }
+    var selectedModel by remember { mutableStateOf(ModelType.NONE) }
+
+    LaunchedEffect(selectedStock) {
+        stockViewModel.loadStockData(selectedStock)
+        if (selectedModel == ModelType.APPROXIMATION) {
+            approximationViewModel.loadApproximation(selectedStock)
+        }
     }
 
     Column(
@@ -95,8 +128,42 @@ fun GraphPage(
     ) {
         Spacer(modifier = Modifier.height(48.dp))
 
+        // Stock selection dropdown
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            Box {
+                Button(
+                    onClick = { expandedStockMenu = true },
+                    colors = ButtonDefaults.buttonColors(containerColor = DarkThemeColors.primary)
+                ) {
+                    Text("Stock: $selectedStock")
+                }
+
+                DropdownMenu(
+                    expanded = expandedStockMenu,
+                    onDismissRequest = { expandedStockMenu = false }
+                ) {
+                    availableStocks.forEach { stock ->
+                        DropdownMenuItem(
+                            text = { Text(stock) },
+                            onClick = {
+                                selectedStock = stock
+                                expandedStockMenu = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
+
         Text(
-            text = "$stockSymbol Stock Data",
+            text = "Stock Data for $selectedStock",
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = DarkThemeColors.onBackground,
@@ -105,27 +172,128 @@ fun GraphPage(
                 .padding(bottom = 16.dp),
             textAlign = TextAlign.Center
         )
-        Button(
-            onClick = { navController.navigate("main") },
-            colors = ButtonDefaults.buttonColors(containerColor = DarkThemeColors.primary),
+
+        Row(
             modifier = Modifier
-                .padding(start = 16.dp, bottom = 16.dp)
-                .align(Alignment.Start)
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text("← Back", color = Color.White)
+            Button(
+                onClick = { navController.navigate("main") },
+                colors = ButtonDefaults.buttonColors(containerColor = DarkThemeColors.primary)
+            ) {
+                Text("Back", color = Color.White)
+            }
+
+            if (selectedModel == ModelType.APPROXIMATION) {
+                val degreeOptions = listOf(1, 2, 3, 4, 5)
+                var expandedDegree by remember { mutableStateOf(false) }
+                var selectedDegree by remember { mutableStateOf(3) }
+
+                Box {
+                    OutlinedButton(
+                        onClick = { expandedDegree = true },
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = DarkThemeColors.primary
+                        )
+                    ) {
+                        Text("Degree: $selectedDegree")
+                    }
+
+                    DropdownMenu(
+                        expanded = expandedDegree,
+                        onDismissRequest = { expandedDegree = false }
+                    ) {
+                        degreeOptions.forEach { degree ->
+                            DropdownMenuItem(
+                                text = { Text(degree.toString()) },
+                                onClick = {
+                                    selectedDegree = degree
+                                    expandedDegree = false
+                                    approximationViewModel.setDegree(degree)
+                                    approximationViewModel.loadApproximation(selectedStock)
+                                }
+                            )
+                        }
+                    }
+                }
+            }
         }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            ModelType.values().forEach { modelType ->
+                OutlinedButton(
+                    onClick = {
+                        selectedModel = modelType
+                        when (modelType) {
+                            ModelType.APPROXIMATION -> approximationViewModel.loadApproximation(selectedStock)
+                            else -> {}
+                        }
+                    },
+                    colors = ButtonDefaults.outlinedButtonColors(
+                        contentColor = if (selectedModel == modelType) DarkThemeColors.primary else DarkThemeColors.onBackground
+                    ),
+                    border = ButtonDefaults.outlinedButtonBorder.copy(
+                        brush = SolidColor(if (selectedModel == modelType) DarkThemeColors.primary else DarkThemeColors.onBackground.copy(alpha = 0.5f))
+                    )
+                ) {
+                    Text(modelType.displayName)
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(8.dp))
 
         when {
             isLoading -> {
-                LoadingView(stockSymbol)
+                LoadingView(selectedStock)
             }
             error != null -> {
                 ErrorView(error!!) {
-                    viewModel.loadStockData(stockSymbol)
+                    stockViewModel.loadStockData(selectedStock)
                 }
             }
             stockData != null -> {
-                DataView(stockData!!)
+                val modelData = when (selectedModel) {
+                    ModelType.APPROXIMATION -> approximationData
+                    else -> null
+                }
+
+                val modelIsLoading = when (selectedModel) {
+                    ModelType.APPROXIMATION -> approxIsLoading
+                    else -> false
+                }
+
+                val modelColumnName = when (selectedModel) {
+                    ModelType.APPROXIMATION -> "Approximation"
+                    else -> ""
+                }
+
+                if (selectedModel == ModelType.APPROXIMATION && approxError != null) {
+                    ErrorView(approxError!!) {
+                        approximationViewModel.loadApproximation(selectedStock)
+                    }
+                } else if (selectedModel != ModelType.NONE && modelIsLoading) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            CircularProgressIndicator(color = DarkThemeColors.primary)
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "Calculating ${selectedModel.displayName} model...",
+                                color = DarkThemeColors.onBackground
+                            )
+                        }
+                    }
+                } else {
+                    DataView(stockData!!, modelData, selectedModel.displayName, modelColumnName)
+                }
             }
             else -> {
                 Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -140,13 +308,11 @@ fun GraphPage(
 }
 
 /**
- * Displays a loading indicator with text while data is being fetched.
- * Centers a progress spinner and loading message on the screen.
+ * Composable function that displays a loading indicator with appropriate text.
+ * Shows a circular progress indicator and a message indicating which stock data is being loaded.
+ * This view is displayed while data is being fetched from the API.
  *
- * @param stockSymbol The stock symbol being loaded, displayed in the loading message
- *
- * Uses CircularProgressIndicator with the primary theme color and displays
- * a loading message that includes the stock symbol being loaded.
+ * @param stockSymbol The stock symbol for which data is being loaded (e.g., "AAPL", "MSFT").
  */
 @Composable
 private fun LoadingView(stockSymbol: String) {
@@ -155,7 +321,7 @@ private fun LoadingView(stockSymbol: String) {
             CircularProgressIndicator(color = DarkThemeColors.primary)
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = "Loading $stockSymbol data...",
+                text = "Loading data for $stockSymbol...",
                 color = DarkThemeColors.onBackground
             )
         }
@@ -163,14 +329,12 @@ private fun LoadingView(stockSymbol: String) {
 }
 
 /**
- * Displays an error message with a retry button when data fetching fails.
- * Centers the error message and retry button on the screen.
+ * Composable function that displays an error message with a retry button.
+ * Used when data fetching or processing encounters an error, allowing users to retry the operation.
  *
- * @param errorMessage The error message to display to the user
- * @param onRetry Callback function that will be invoked when the user clicks the retry button
- *
- * The error message is displayed in the error color from the theme and
- * includes a retry button that allows users to attempt loading the data again.
+ * @param errorMessage Detailed error message to be displayed to the user.
+ * @param onRetry Callback function to be invoked when the retry button is clicked.
+ *                This typically triggers a new attempt to fetch or process data.
  */
 @Composable
 private fun ErrorView(errorMessage: String, onRetry: () -> Unit) {
@@ -193,30 +357,28 @@ private fun ErrorView(errorMessage: String, onRetry: () -> Unit) {
 }
 
 /**
- * Displays stock data in a chart and tabular format.
- * The view is split into two main sections:
- * 1. A line chart visualization of stock prices over time
- * 2. A scrollable data table showing detailed time/price information
+ * Composable function that displays stock data in both chart and tabular formats.
+ * This component is responsible for visualizing:
+ * 1. A line chart showing stock price trends using MPAndroidChart
+ * 2. A scrollable table showing detailed numerical data
  *
- * @param dataFrame A DataFrame containing stock data with Time and Price columns
+ * When model data is provided, it overlays the model's predictions on the chart
+ * and adds an additional column to the table for comparison.
  *
- * The chart section:
- * - Uses MPAndroidChart's LineChart to visualize stock price trends
- * - Implements dark theme styling for the chart
- * - Configures user interactions like pinch-zoom, drag, and touch
- * - Draws a cubic Bezier line with shaded area below
- *
- * The table section:
- * - Displays a header row with column names
- * - Shows time and price data in rows
- * - Formats price values with a decimal formatter
- * - Implements scrolling through LazyColumn for large datasets
- * - Uses dividers between rows for visual separation
+ * @param dataFrame DataFrame containing stock data with columns including "Time" and "Price".
+ * @param modelDataFrame Optional DataFrame containing model data (e.g., approximation values).
+ *                       When null, only raw stock data is displayed.
+ * @param modelName Display name of the model being shown (used in chart legend).
+ * @param modelColumnName The column name in modelDataFrame that contains the model values to display.
  */
 @Composable
-private fun DataView(dataFrame: DataFrame<StockEntry>) {
+private fun DataView(
+    dataFrame: DataFrame<StockEntry>,
+    modelDataFrame: DataFrame<*>? = null,
+    modelName: String = "Approximation",
+    modelColumnName: String = "Approximation"
+) {
     Column(modifier = Modifier.fillMaxSize()) {
-        // Stock chart
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -233,7 +395,6 @@ private fun DataView(dataFrame: DataFrame<StockEntry>) {
                         setScaleEnabled(true)
                         setPinchZoom(true)
 
-                        // Dark theme styling
                         setBackgroundColor(AndroidColor.TRANSPARENT)
                         setGridBackgroundColor(AndroidColor.TRANSPARENT)
                         legend.textColor = AndroidColor.WHITE
@@ -255,15 +416,15 @@ private fun DataView(dataFrame: DataFrame<StockEntry>) {
                     }
                 },
                 update = { chart ->
-                    val entries = ArrayList<Entry>()
+                    val dataSets = ArrayList<ILineDataSet>()
 
-                    // Extract price data
+                    val stockEntries = ArrayList<Entry>()
                     for (i in 0 until dataFrame.rowsCount()) {
                         val price = dataFrame["Price"][i].toString().toFloatOrNull() ?: 0f
-                        entries.add(Entry(i.toFloat(), price))
+                        stockEntries.add(Entry(i.toFloat(), price))
                     }
 
-                    val dataSet = LineDataSet(entries, "Price").apply {
+                    val stockDataSet = LineDataSet(stockEntries, "Price").apply {
                         color = AndroidColor.rgb(66, 134, 244)
                         valueTextColor = AndroidColor.WHITE
                         lineWidth = 2f
@@ -275,14 +436,36 @@ private fun DataView(dataFrame: DataFrame<StockEntry>) {
                         fillAlpha = 50
                     }
 
-                    chart.data = LineData(dataSet)
+                    dataSets.add(stockDataSet)
+
+                    if (modelDataFrame != null) {
+                        val modelEntries = ArrayList<Entry>()
+
+                        for (i in 0 until modelDataFrame.rowsCount()) {
+                            val modelPrice = modelDataFrame[modelColumnName][i].toString().toFloatOrNull() ?: 0f
+                            modelEntries.add(Entry(i.toFloat(), modelPrice))
+                        }
+
+                        val modelDataSet = LineDataSet(modelEntries, modelName).apply {
+                            color = AndroidColor.rgb(255, 165, 0)
+                            valueTextColor = AndroidColor.WHITE
+                            lineWidth = 2f
+                            setDrawCircles(false)
+                            setDrawValues(false)
+                            mode = LineDataSet.Mode.CUBIC_BEZIER
+                            enableDashedLine(10f, 5f, 0f)
+                        }
+
+                        dataSets.add(modelDataSet)
+                    }
+
+                    chart.data = LineData(dataSets)
                     chart.invalidate()
                 },
                 modifier = Modifier.fillMaxSize()
             )
         }
 
-        // Data table
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -290,7 +473,6 @@ private fun DataView(dataFrame: DataFrame<StockEntry>) {
             colors = CardDefaults.cardColors(containerColor = DarkThemeColors.surface)
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
-                // Table header
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -309,15 +491,23 @@ private fun DataView(dataFrame: DataFrame<StockEntry>) {
                         color = DarkThemeColors.onSurface,
                         modifier = Modifier.weight(1f)
                     )
+
+                    if (modelDataFrame != null) {
+                        Text(
+                            text = modelColumnName,
+                            fontWeight = FontWeight.Bold,
+                            color = DarkThemeColors.onSurface,
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
                 }
 
                 Divider(color = DarkThemeColors.onSurface.copy(alpha = 0.2f))
 
-                // Table content
                 val priceFormatter = remember { DecimalFormat("#,##0.00") }
 
                 LazyColumn {
-                    items((0 until dataFrame.rowsCount()).toList()) { rowIndex ->
+                    items(dataFrame.rowsCount()) { rowIndex ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -335,6 +525,15 @@ private fun DataView(dataFrame: DataFrame<StockEntry>) {
                                 color = DarkThemeColors.onSurface,
                                 modifier = Modifier.weight(1f)
                             )
+
+                            if (modelDataFrame != null && rowIndex < modelDataFrame.rowsCount()) {
+                                val modelValue = modelDataFrame[modelColumnName][rowIndex].toString().toDoubleOrNull()
+                                Text(
+                                    text = if (modelValue != null) priceFormatter.format(modelValue) else "-",
+                                    color = Color(0xFFFF9800),
+                                    modifier = Modifier.weight(1f)
+                                )
+                            }
                         }
 
                         if (rowIndex < dataFrame.rowsCount() - 1) {

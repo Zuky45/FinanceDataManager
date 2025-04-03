@@ -8,18 +8,15 @@ import org.jetbrains.kotlinx.dataframe.api.maxOrNull
 import org.jetbrains.kotlinx.dataframe.api.minOrNull
 import kotlin.collections.average
 
-abstract  class Model {
-    private val name: String
-    private val dataFrame: DataFrame<*>?
+abstract  class Model(private val name: String, private val dataFrame: DataFrame<*>? = null) {
 
-    constructor(name: String, dataFrame: DataFrame<*>? = null) {
-        this.name = name
-        this.dataFrame = dataFrame
-    }
     abstract fun calculateModel()
     abstract fun getModel(): DataFrame<*>?
     fun getName(): String {
         return name
+    }
+    protected  fun getDataFrame(): DataFrame<*>? {
+        return dataFrame
     }
     fun calculateAverage(): Double {
         return if (dataFrame != null && dataFrame.rowsCount() > 0 && "Price" in dataFrame.columnNames()) {

@@ -24,4 +24,11 @@
         <string name="main">Not implemented yet %1$s</string>
         <string name="home">Home</string>
         <string name="graph">Graph</string>
+        <string name="stock_data_title">%1$s Stock Data</string>
+        <string name="back_button">← Back</string>
+        <string name="loading_stock_data">Loading %1$s data…</string>
+        <string name="no_data_available">No data available</string>
+        <string name="retry">Retry</string>
+        <string name="column_time">Time</string>
+        <string name="column_price">Price</string>
 </resources>
