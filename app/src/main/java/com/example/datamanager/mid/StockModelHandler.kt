@@ -27,13 +27,13 @@ class StockModelHandler : ModelHandler() {
     fun loadStockData(symbol: String) {
         loadData {
             Log.d("StockViewModel", "Fetching data for $symbol")
-            val result = apiManager.fetchData(symbol)
+            val result = getApiManager().fetchData(symbol)
 
             if (result != null) {
                 Log.d("StockViewModel", "Data received: ${result.rowsCount()} rows")
                 _stockData.value = result
             } else {
-                _error.value = "No data available for $symbol"
+                getError().value = "No data available for $symbol"
             }
         }
     }

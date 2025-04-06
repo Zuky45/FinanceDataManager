@@ -47,14 +47,14 @@ class ApproximationModelHandler : ModelHandler() {
     fun loadApproximation(symbol: String) {
         loadData {
             Log.d("ApproximationViewModel", "Fetching data for $symbol")
-            val result = apiManager.fetchData(symbol)
+            val result = getApiManager().fetchData(symbol)
 
             if (result != null) {
                 Log.d("ApproximationViewModel", "Data received: ${result.rowsCount()} rows")
                 _stockData.value = result
                 calculateApproximation(result)
             } else {
-                _error.value = "No data available for $symbol"
+                getError().value = "No data available for $symbol"
             }
         }
     }
@@ -73,11 +73,11 @@ class ApproximationModelHandler : ModelHandler() {
             _coefficients.value = approximation.getCoefficients()
 
             if (_approximationData.value == null) {
-                _error.value = "Failed to calculate approximation model"
+                getError().value = "Failed to calculate approximation model"
             }
         } catch (e: Exception) {
             Log.e("ApproximationViewModel", "Error calculating approximation", e)
-            _error.value = "Error calculating approximation: ${e.message}"
+            getError().value = "Error calculating approximation: ${e.message}"
         }
     }
 }
