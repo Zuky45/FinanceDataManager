@@ -1,7 +1,6 @@
 package com.example.datamanager.mid
 
 import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.example.datamanager.backend.api_manager.StockEntry
 import com.example.datamanager.backend.models.Approximation
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +25,7 @@ class ApproximationModelHandler : ModelHandler() {
     private val _coefficients = MutableStateFlow<DoubleArray?>(null)
 
     // Default polynomial degree
-    private var degree: Int = 1
+    private var _degree: Int = 1
 
     /**
      * Sets the polynomial degree for the approximation.
@@ -34,7 +33,7 @@ class ApproximationModelHandler : ModelHandler() {
      * @param newDegree The degree of polynomial to use for approximation
      */
     fun setDegree(newDegree: Int) {
-        degree = newDegree
+        _degree = newDegree
         // Recalculate if we already have data
         _stockData.value?.let { calculateApproximation(it) }
     }
@@ -66,7 +65,7 @@ class ApproximationModelHandler : ModelHandler() {
      */
     private fun calculateApproximation(stockData: DataFrame<StockEntry>) {
         try {
-            val approximation = Approximation(stockData, degree)
+            val approximation = Approximation(stockData, _degree)
             approximation.calculateModel()
 
             _approximationData.value = approximation.getModel()

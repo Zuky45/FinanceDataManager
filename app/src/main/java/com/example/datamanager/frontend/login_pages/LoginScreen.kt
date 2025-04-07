@@ -13,18 +13,28 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.datamanager.R
+import com.example.datamanager.mid.login_pages.LoginModelHandler
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-    var isLoading by rememberSaveable { mutableStateOf(false) }
+    val modelHandler: LoginModelHandler = viewModel()
+    val email by modelHandler.email.collectAsState()
+    val password by modelHandler.password.collectAsState()
+    val isLoading by modelHandler.isLoading.collectAsState()
+    val loginSuccess by modelHandler.loginSuccess.collectAsState()
     var isLoginError by rememberSaveable { mutableStateOf(false) }
 
-
+    // Handle successful login
+    LaunchedEffect(loginSuccess) {
+        if (loginSuccess) {
+            navController.navigate("main")
+            modelHandler.resetState()
+        }
+    }
 
     MaterialTheme(colorScheme = customColors) {
         Surface(
@@ -48,14 +58,14 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
                 OutlinedTextField(
                     value = email,
                     onValueChange = {
-                        email = it
+                        modelHandler.updateEmail(it)
                         isLoginError = false
                     },
                     label = { Text(stringResource(R.string.email)) },
                     singleLine = true,
-                    isError = email.isNotEmpty() && !isEmailValid(email),
+                    isError = email.isNotEmpty() && !modelHandler.isEmailValid(email),
                     supportingText = {
-                        if (email.isNotEmpty() && !isEmailValid(email)) {
+                        if (email.isNotEmpty() && !modelHandler.isEmailValid(email)) {
                             Text(stringResource(R.string.invalid_email))
                         }
                     },
@@ -68,7 +78,7 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
                 OutlinedTextField(
                     value = password,
                     onValueChange = {
-                        password = it
+                        modelHandler.updatePassword(it)
                         isLoginError = false
                     },
                     label = { Text(stringResource(R.string.password)) },
@@ -88,18 +98,16 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
 
                 Button(
                     onClick = {
-                        isLoading = true
-                        if (email == "admin@example.com" && password == "admin") {
-                            navController.navigate("main")
+                        if (modelHandler.validateCredentials(email, password)) {
+                            modelHandler.login()
                         } else {
                             isLoginError = true
-                            isLoading = false
                         }
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
-                    enabled = isEmailValid(email) && password.isNotEmpty() && !isLoading,
+                    enabled = modelHandler.isFormValid(email, password) && !isLoading,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary

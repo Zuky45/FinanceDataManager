@@ -6,25 +6,27 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.datamanager.R
-import kotlinx.coroutines.flow.callbackFlow
+import com.example.datamanager.mid.login_pages.NewAccountModelHandler
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) {
-    var email by rememberSaveable { mutableStateOf("") }
-    var password by rememberSaveable { mutableStateOf("") }
-    var password2 by rememberSaveable { mutableStateOf("") }
-    var passwordVisibility by rememberSaveable { mutableStateOf(false) }
-    var isLoading by rememberSaveable { mutableStateOf(false) }
+    val modelHandler: NewAccountModelHandler = viewModel()
+    val email by modelHandler.email.collectAsState()
+    val password by modelHandler.password.collectAsState()
+    val confirmPassword by modelHandler.confirmPassword.collectAsState()
+    val passwordVisibility by modelHandler.passwordVisibility.collectAsState()
+    val isLoading by modelHandler.isLoading.collectAsState()
+    val accountCreated by modelHandler.accountCreated.collectAsState()
 
     MaterialTheme(colorScheme = customColors) {
         Surface(
@@ -47,12 +49,12 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
 
                 OutlinedTextField(
                     value = email,
-                    onValueChange = { email = it },
+                    onValueChange = { modelHandler.updateEmail(it) },
                     label = { Text(stringResource(R.string.email)) },
                     singleLine = true,
-                    isError = email.isNotEmpty() && !isEmailValid(email),
+                    isError = email.isNotEmpty() && !modelHandler.isEmailValid(email),
                     supportingText = {
-                        if (email.isNotEmpty() && !isEmailValid(email)) {
+                        if (email.isNotEmpty() && !modelHandler.isEmailValid(email)) {
                             Text(stringResource(R.string.invalid_email))
                         }
                     },
@@ -64,13 +66,13 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
 
                 OutlinedTextField(
                     value = password,
-                    onValueChange = { password = it },
+                    onValueChange = { modelHandler.updatePassword(it) },
                     label = { Text(stringResource(R.string.password)) },
                     singleLine = true,
                     visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-                    isError = password.isNotEmpty() && !passwordsMatches(password, password2),
+                    isError = password.isNotEmpty() && !modelHandler.passwordsMatch(password, confirmPassword),
                     supportingText = {
-                        if (password2.isNotEmpty() && !passwordsMatches(password, password2)) {
+                        if (confirmPassword.isNotEmpty() && !modelHandler.passwordsMatch(password, confirmPassword)) {
                             Text(stringResource(R.string.passwords_not_match))
                         }
                     },
@@ -81,14 +83,14 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
                 )
 
                 OutlinedTextField(
-                    value = password2,
-                    onValueChange = { password2 = it },
+                    value = confirmPassword,
+                    onValueChange = { modelHandler.updateConfirmPassword(it) },
                     label = { Text(stringResource(R.string.confirm_password)) },
                     singleLine = true,
                     visualTransformation = if (passwordVisibility) VisualTransformation.None else PasswordVisualTransformation(),
-                    isError = password2.isNotEmpty() && !passwordsMatches(password, password2),
+                    isError = confirmPassword.isNotEmpty() && !modelHandler.passwordsMatch(password, confirmPassword),
                     supportingText = {
-                        if (password2.isNotEmpty() && !passwordsMatches(password, password2)) {
+                        if (confirmPassword.isNotEmpty() && !modelHandler.passwordsMatch(password, confirmPassword)) {
                             Text(stringResource(R.string.passwords_not_match))
                         }
                     },
@@ -97,16 +99,23 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
                         .fillMaxWidth()
                         .padding(bottom = 24.dp)
                 )
+                IconButton(
+                    onClick = { modelHandler.togglePasswordVisibility() },
+                    modifier = Modifier.padding(bottom = 16.dp)
+                ) {
+                    Icon(
+                        imageVector = if (passwordVisibility) Icons.Default.Visibility else Icons.Default.VisibilityOff,
+                        contentDescription = (if (passwordVisibility) R.string.hide_password.toString() else R.string.show_password).toString()
+                    )
+                }
 
                 Button(
-                    onClick = {
-                        isLoading = true
-                    },
+                    onClick = { modelHandler.createAccount() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
-                    enabled = isEmailValid(email) && passwordsMatches(password, password2) &&
-                            password.isNotEmpty() && password2.isNotEmpty() && !isLoading,
+                    enabled = modelHandler.isEmailValid(email) && modelHandler.passwordsMatch(password, confirmPassword) &&
+                            password.isNotEmpty() && confirmPassword.isNotEmpty() && !isLoading && !accountCreated,
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary
@@ -117,7 +126,11 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
                             modifier = Modifier.size(24.dp),
                             color = MaterialTheme.colorScheme.onPrimary
                         )
-                    } else {
+                    } else if (accountCreated) {
+                        Text(stringResource(R.string.account_created))
+
+                    }
+                    else {
                         Text(stringResource(R.string.create_account))
                     }
                 }

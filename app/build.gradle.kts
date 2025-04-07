@@ -157,5 +157,6 @@ android {
         implementation("androidx.compose.ui:ui-tooling-preview:1.5.4")
         debugImplementation("androidx.compose.ui:ui-tooling:1.5.4")
         implementation("org.apache.commons:commons-math3:3.6.1")
+        implementation("androidx.compose.material:material-icons-extended:1.5.4")
     }
 }

@@ -123,6 +123,7 @@ fun GraphPage(
     // Error message for approximation data
     val approxError by approximationViewModel.error.collectAsState()
 
+
     // List of available stocks for selection
     val availableStocks = stockViewModel.avaliableActions()
     // State variables for managing dropdown menus and selected options
@@ -131,6 +132,7 @@ fun GraphPage(
     var selectedStock by remember { mutableStateOf(stockSymbol) }
     // Selected model type for data visualization
     var selectedModel by remember { mutableStateOf(ModelType.NONE) }
+
 
     // Load stock data when the selected stock changes
     LaunchedEffect(selectedStock) {
