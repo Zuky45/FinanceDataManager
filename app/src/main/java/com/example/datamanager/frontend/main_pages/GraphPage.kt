@@ -5,7 +5,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -20,8 +19,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.datamanager.backend.api_manager.StockEntry
-import com.example.datamanager.mid.ApproximationModelHandler
-import com.example.datamanager.mid.StockModelHandler
+import com.example.datamanager.mid.main_pages.ApproximationModelHandler
+import com.example.datamanager.mid.main_pages.StockModelHandler
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
 import com.github.mikephil.charting.data.Entry

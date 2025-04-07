@@ -1,4 +1,4 @@
-package com.example.datamanager.mid
+package com.example.datamanager.mid.main_pages
 
 import android.util.Log
 import androidx.lifecycle.ViewModel

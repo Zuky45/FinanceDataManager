@@ -1,37 +1,37 @@
 package com.example.datamanager.frontend.main_pages
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.datamanager.R
+import com.example.datamanager.mid.main_pages.MainPageModelHandler
 import kotlinx.coroutines.launch
 
-/**
- * MainPage composable function that displays the main content of the app.
- * It includes a navigation drawer and a top app bar.
- *
- * @param navController The NavController used for navigation between screens.
- */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainPage(navController: NavController) {
-    // State for the drawer
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
-    // Coroutine scope for launching coroutines
     val scope = rememberCoroutineScope()
-    // State for the selected option in the drawer
-    var selectedOption by remember { mutableStateOf("") }
+    var selectedOption by remember { mutableStateOf("Dashboard") }
 
-    // Custom MaterialTheme with custom colors
+    val modelHandler: MainPageModelHandler = viewModel()
+    val actions by modelHandler.actions.collectAsState()
+    val isLoading by modelHandler.isLoading.collectAsState()
+    val refreshTime by modelHandler.refreshTime.collectAsState()
+
     MaterialTheme(colorScheme = customColors) {
-        // ModalNavigationDrawer with drawer content
         ModalNavigationDrawer(
             drawerState = drawerState,
             drawerContent = {
@@ -49,28 +49,13 @@ fun MainPage(navController: NavController) {
                     Divider(color = customColors.onSurface.copy(alpha = 0.2f))
                     Spacer(modifier = Modifier.height(8.dp))
 
-                    // Navigation drawer items
-                    val chooseData = stringResource(R.string.choose_data)
+                    val viewGraph = stringResource(R.string.graph)
                     NavigationDrawerItem(
-                        icon = { Icon(Icons.Default.DateRange, null) },
-                        label = { Text(chooseData) },
-                        selected = selectedOption == chooseData,
+                        icon = { Icon(Icons.Default.BarChart, null) },
+                        label = { Text(viewGraph) },
+                        selected = selectedOption == viewGraph,
                         onClick = {
-                            selectedOption = chooseData
-                            scope.launch {
-                                drawerState.close()
-                                navController.navigate("choose_data")
-                            }
-                        },
-                        modifier = Modifier.padding(horizontal = 12.dp)
-                    )
-                    val graph = stringResource(R.string.graph)
-                    NavigationDrawerItem(
-                        icon = { Icon(Icons.Default.DateRange, null) },
-                        label = { Text(graph) },
-                        selected = selectedOption == graph,
-                        onClick = {
-                            selectedOption = graph
+                            selectedOption = viewGraph
                             scope.launch {
                                 drawerState.close()
                                 navController.navigate("graph")
@@ -79,55 +64,11 @@ fun MainPage(navController: NavController) {
                         modifier = Modifier.padding(horizontal = 12.dp)
                     )
 
-                    val mathModels = stringResource(R.string.math_models)
-                    NavigationDrawerItem(
-                        icon = { Icon(Icons.Default.DateRange, null) },
-                        label = { Text(mathModels) },
-                        selected = selectedOption == mathModels,
-                        onClick = {
-                            selectedOption = mathModels
-                            scope.launch {
-                                drawerState.close()
-                                navController.navigate("math_models")
-                            }
-                        },
-                        modifier = Modifier.padding(horizontal = 12.dp)
-                    )
 
-                    val settings = stringResource(R.string.settings)
-                    NavigationDrawerItem(
-                        icon = { Icon(Icons.Default.Settings, null) },
-                        label = { Text(settings) },
-                        selected = selectedOption == settings,
-                        onClick = {
-                            selectedOption = settings
-                            scope.launch {
-                                drawerState.close()
-                                navController.navigate("settings")
-                            }
-                        },
-                        modifier = Modifier.padding(horizontal = 12.dp)
-                    )
 
-                    Spacer(modifier = Modifier.weight(1f))
-
-                    val logout = stringResource(R.string.logout)
-                    NavigationDrawerItem(
-                        icon = { Icon(Icons.Default.Clear, null) },
-                        label = { Text(logout) },
-                        selected = selectedOption == logout,
-                        onClick = {
-                            scope.launch {
-                                drawerState.close()
-                                navController.navigate("login")
-                            }
-                        },
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 16.dp)
-                    )
                 }
             }
         ) {
-            // Scaffold with top app bar and main content
             Scaffold(
                 topBar = {
                     TopAppBar(
@@ -135,6 +76,11 @@ fun MainPage(navController: NavController) {
                         navigationIcon = {
                             IconButton(onClick = { scope.launch { drawerState.open() } }) {
                                 Icon(Icons.Default.Menu, contentDescription = stringResource(R.string.menu))
+                            }
+                        },
+                        actions = {
+                            IconButton(onClick = { modelHandler.refreshPrices() }) {
+                                Icon(Icons.Default.Refresh, contentDescription = "Refresh prices")
                             }
                         },
                         colors = TopAppBarDefaults.topAppBarColors(
@@ -145,16 +91,107 @@ fun MainPage(navController: NavController) {
                 },
                 containerColor = customColors.background
             ) { paddingValues ->
-                Box(
+                Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues),
-                    contentAlignment = Alignment.Center
+                        .padding(paddingValues)
+                        .padding(16.dp)
                 ) {
-                    Text(
-                        stringResource(R.string.main, selectedOption),
-                        color = customColors.onBackground
-                    )
+                    if (refreshTime.isNotEmpty()) {
+                        Text(
+                            text = "Last updated: $refreshTime",
+                            style = MaterialTheme.typography.bodySmall,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = TextAlign.End
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(
+                            containerColor = customColors.surface
+                        )
+                    ) {
+                        Column(modifier = Modifier.padding(16.dp)) {
+                            Text(
+                                "Stock Actions",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = customColors.onSurface
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            if (isLoading) {
+                                Box(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(200.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator()
+                                }
+                            } else {
+                                // Header row
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
+                                    Text(
+                                        "Symbol",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        modifier = Modifier.weight(1f)
+                                    )
+                                    Text(
+                                        "Price",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        modifier = Modifier.weight(1f),
+                                        textAlign = TextAlign.End
+                                    )
+                                    Text(
+                                        "Change",
+                                        style = MaterialTheme.typography.labelMedium,
+                                        modifier = Modifier.weight(1f),
+                                        textAlign = TextAlign.End
+                                    )
+                                }
+
+                                Divider(modifier = Modifier.padding(vertical = 8.dp))
+
+                                LazyColumn {
+                                    items(actions) { action ->
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = 8.dp),
+                                            horizontalArrangement = Arrangement.SpaceBetween,
+                                            verticalAlignment = Alignment.CenterVertically
+                                        ) {
+                                            Text(
+                                                action.name,
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                modifier = Modifier.weight(1f)
+                                            )
+                                            Text(
+                                                "$${action.price}",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                modifier = Modifier.weight(1f),
+                                                textAlign = TextAlign.End
+                                            )
+                                            Text(
+                                                "${if (action.change > 0) "+" else ""}${action.change}%",
+                                                style = MaterialTheme.typography.bodyMedium,
+                                                color = if (action.change > 0) Color.Green else if (action.change < 0) Color.Red else Color.Gray,
+                                                modifier = Modifier.weight(1f),
+                                                textAlign = TextAlign.End
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }

@@ -26,6 +26,9 @@ class NewAccountModelHandler : ViewModel() {
     private val _accountCreated = MutableStateFlow(false)
     val accountCreated = _accountCreated.asStateFlow()
 
+    private val _accountError = MutableStateFlow(false)
+    val accountError = _accountError.asStateFlow()
+
     fun updateEmail(newEmail: String) {
         _email.value = newEmail
     }
@@ -71,11 +74,11 @@ class NewAccountModelHandler : ViewModel() {
 
         _isLoading.value = true
 
-        // Simulate network delay
         viewModelScope.launch {
             delay(2000) // Simulate network request
             _isLoading.value = false
             _accountCreated.value = true
+            _accountError.value = false
         }
     }
 }

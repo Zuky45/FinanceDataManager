@@ -35,5 +35,6 @@
         <string name="account_created">Account created successfully</string>
         <string name="hide_password">Hide Password</string>
         <string name="show_password">Show Password</string>
-
+        <string name="account_created_message">Account created successfully. You can now log in.</string>
+        <string name="account_creation_failed">Account creation failed. Please try again.</string>
 </resources>

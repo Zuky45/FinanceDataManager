@@ -27,6 +27,7 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
     val passwordVisibility by modelHandler.passwordVisibility.collectAsState()
     val isLoading by modelHandler.isLoading.collectAsState()
     val accountCreated by modelHandler.accountCreated.collectAsState()
+    val accountError by modelHandler.accountError.collectAsState()
 
     MaterialTheme(colorScheme = customColors) {
         Surface(
@@ -129,7 +130,11 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
                     } else if (accountCreated) {
                         Text(stringResource(R.string.account_created))
 
+                    } else if (accountError) {
+                        Text(stringResource(R.string.account_creation_failed))
                     }
+
+
                     else {
                         Text(stringResource(R.string.create_account))
                     }
