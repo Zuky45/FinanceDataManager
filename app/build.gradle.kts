@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
+    id("com.google.gms.google-services")
 }
 
 android {
@@ -76,6 +77,7 @@ android {
             )
         }
     }
+
 
     dependencies {
         val composeBom = platform("androidx.compose:compose-bom:2024.02.00")
@@ -158,5 +160,13 @@ android {
         debugImplementation("androidx.compose.ui:ui-tooling:1.5.4")
         implementation("org.apache.commons:commons-math3:3.6.1")
         implementation("androidx.compose.material:material-icons-extended:1.5.4")
+        implementation(platform("com.google.firebase:firebase-bom:33.12.0"))
+        implementation("com.google.firebase:firebase-core:21.1.1")
+        implementation("com.google.firebase:firebase-auth-ktx:22.3.0")
+        implementation("com.google.firebase:firebase-firestore-ktx:24.10.0")
     }
+}
+dependencies {
+    implementation(libs.firebase.auth.ktx)
+    implementation(libs.firebase.firestore.ktx)
 }

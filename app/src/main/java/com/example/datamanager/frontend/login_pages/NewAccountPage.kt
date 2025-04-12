@@ -12,10 +12,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.datamanager.R
 import com.example.datamanager.mid.login_pages.NewAccountModelHandler
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -94,6 +96,9 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
                         if (confirmPassword.isNotEmpty() && !modelHandler.passwordsMatch(password, confirmPassword)) {
                             Text(stringResource(R.string.passwords_not_match))
                         }
+                        else if (password.isNotEmpty() && !modelHandler.passwordValid(password)) {
+                            Text(stringResource(R.string.password_invalid), color = MaterialTheme.colorScheme.error)
+                        }
                     },
                     leadingIcon = { Icon(Icons.Default.Lock, stringResource(R.string.icon_confirm_password)) },
                     modifier = Modifier
@@ -111,12 +116,15 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
                 }
 
                 Button(
-                    onClick = { modelHandler.createAccount() },
+                    onClick = {
+                            modelHandler.createAccount()
+                    },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
                     enabled = modelHandler.isEmailValid(email) && modelHandler.passwordsMatch(password, confirmPassword) &&
-                            password.isNotEmpty() && confirmPassword.isNotEmpty() && !isLoading && !accountCreated,
+                            password.isNotEmpty() && confirmPassword.isNotEmpty() && !isLoading &&
+                            !accountCreated && modelHandler.passwordValid(password),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         contentColor = MaterialTheme.colorScheme.onPrimary

@@ -26,6 +26,7 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
     val password by modelHandler.password.collectAsState()
     val isLoading by modelHandler.isLoading.collectAsState()
     val loginSuccess by modelHandler.loginSuccess.collectAsState()
+    val invalidUser by modelHandler.invalidUser.collectAsState()
     var isLoginError by rememberSaveable { mutableStateOf(false) }
 
     // Handle successful login
@@ -66,7 +67,8 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
                     isError = email.isNotEmpty() && !modelHandler.isEmailValid(email),
                     supportingText = {
                         if (email.isNotEmpty() && !modelHandler.isEmailValid(email)) {
-                            Text(stringResource(R.string.invalid_email))
+                            Text(stringResource(R.string.invalid_email), color = MaterialTheme.colorScheme.error)
+
                         }
                     },
                     leadingIcon = { Icon(Icons.Default.Email, stringResource(R.string.icon_email)) },
@@ -86,9 +88,14 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
                     visualTransformation = PasswordVisualTransformation(),
                     isError = isLoginError,
                     supportingText = {
-                        if (isLoginError) {
-                            Text(stringResource(R.string.invalid_credentials))
+
+                        if (invalidUser) {
+                            Text(
+                                text = stringResource(R.string.invalid_credentials),
+                                color = MaterialTheme.colorScheme.error
+                            )
                         }
+
                     },
                     leadingIcon = { Icon(Icons.Default.Lock, stringResource(R.string.icon_password)) },
                     modifier = Modifier

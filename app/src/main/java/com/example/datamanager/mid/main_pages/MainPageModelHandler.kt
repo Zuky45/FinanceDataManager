@@ -39,7 +39,7 @@ class MainPageModelHandler : ViewModel() {
         }
     }
 
-    suspend fun loadActions() {
+    private suspend fun loadActions() {
         _isLoading.value = true
         Log.d("MainPageModelHandler", "Fetching stock data for multiple symbols")
 

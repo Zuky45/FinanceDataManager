@@ -37,4 +37,5 @@
         <string name="show_password">Show Password</string>
         <string name="account_created_message">Account created successfully. You can now log in.</string>
         <string name="account_creation_failed">Account creation failed. Please try again.</string>
+        <string name="password_invalid">Invalid password format</string>
 </resources>
