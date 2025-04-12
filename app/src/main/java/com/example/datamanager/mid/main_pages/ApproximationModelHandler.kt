@@ -23,9 +23,10 @@ class ApproximationModelHandler : ModelHandler() {
 
     // MutableStateFlow for polynomial coefficients
     private val _coefficients = MutableStateFlow<DoubleArray?>(null)
+    val coefficients: StateFlow<DoubleArray?> = _coefficients.asStateFlow()
 
     // Default polynomial degree
-    private var _degree: Int = 1
+    private var _degree = MutableStateFlow<Int>(1)
 
     /**
      * Sets the polynomial degree for the approximation.
@@ -33,7 +34,7 @@ class ApproximationModelHandler : ModelHandler() {
      * @param newDegree The degree of polynomial to use for approximation
      */
     fun setDegree(newDegree: Int) {
-        _degree = newDegree
+        _degree.value = newDegree
         // Recalculate if we already have data
         _stockData.value?.let { calculateApproximation(it) }
     }
@@ -65,7 +66,7 @@ class ApproximationModelHandler : ModelHandler() {
      */
     private fun calculateApproximation(stockData: DataFrame<StockEntry>) {
         try {
-            val approximation = Approximation(stockData, _degree)
+            val approximation = Approximation(stockData, _degree.value)
             approximation.calculateModel()
 
             _approximationData.value = approximation.getModel()
