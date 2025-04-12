@@ -12,16 +12,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.datamanager.R
 import com.example.datamanager.mid.login_pages.NewAccountModelHandler
-import kotlinx.coroutines.launch
 
+/**
+ * Composable function that represents the "Create New Account" screen.
+ *
+ * @param navController The navigation controller used to navigate between screens.
+ * @param modifier The modifier to be applied to the root composable.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) {
+    // ViewModel to handle account creation logic
     val modelHandler: NewAccountModelHandler = viewModel()
     val email by modelHandler.email.collectAsState()
     val password by modelHandler.password.collectAsState()
@@ -31,6 +36,7 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
     val accountCreated by modelHandler.accountCreated.collectAsState()
     val accountError by modelHandler.accountError.collectAsState()
 
+    // Define the theme and layout for the "Create New Account" screen
     MaterialTheme(colorScheme = customColors) {
         Surface(
             modifier = modifier.fillMaxSize(),
@@ -43,6 +49,7 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+                // Title text for the screen
                 Text(
                     text = stringResource(R.string.create_account),
                     style = MaterialTheme.typography.headlineLarge,
@@ -50,6 +57,7 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
                     modifier = Modifier.padding(bottom = 32.dp)
                 )
 
+                // Email input field
                 OutlinedTextField(
                     value = email,
                     onValueChange = { modelHandler.updateEmail(it) },
@@ -67,6 +75,7 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
                         .padding(bottom = 16.dp)
                 )
 
+                // Password input field
                 OutlinedTextField(
                     value = password,
                     onValueChange = { modelHandler.updatePassword(it) },
@@ -85,6 +94,7 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
                         .padding(bottom = 16.dp)
                 )
 
+                // Confirm password input field
                 OutlinedTextField(
                     value = confirmPassword,
                     onValueChange = { modelHandler.updateConfirmPassword(it) },
@@ -95,8 +105,7 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
                     supportingText = {
                         if (confirmPassword.isNotEmpty() && !modelHandler.passwordsMatch(password, confirmPassword)) {
                             Text(stringResource(R.string.passwords_not_match))
-                        }
-                        else if (password.isNotEmpty() && !modelHandler.passwordValid(password)) {
+                        } else if (password.isNotEmpty() && !modelHandler.passwordValid(password)) {
                             Text(stringResource(R.string.password_invalid), color = MaterialTheme.colorScheme.error)
                         }
                     },
@@ -105,6 +114,8 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
                         .fillMaxWidth()
                         .padding(bottom = 24.dp)
                 )
+
+                // Toggle password visibility button
                 IconButton(
                     onClick = { modelHandler.togglePasswordVisibility() },
                     modifier = Modifier.padding(bottom = 16.dp)
@@ -115,10 +126,9 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
                     )
                 }
 
+                // Create account button
                 Button(
-                    onClick = {
-                            modelHandler.createAccount()
-                    },
+                    onClick = { modelHandler.createAccount() },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(50.dp),
@@ -137,17 +147,14 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
                         )
                     } else if (accountCreated) {
                         Text(stringResource(R.string.account_created))
-
                     } else if (accountError) {
                         Text(stringResource(R.string.account_creation_failed))
-                    }
-
-
-                    else {
+                    } else {
                         Text(stringResource(R.string.create_account))
                     }
                 }
 
+                // Button to navigate back to the login screen
                 TextButton(
                     onClick = { navController.navigate("login") },
                     modifier = Modifier.padding(top = 16.dp),
@@ -168,6 +175,7 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
                     }
                 }
 
+                // Loading indicator displayed when account creation is in progress
                 AnimatedVisibility(visible = isLoading) {
                     LinearProgressIndicator(
                         modifier = Modifier

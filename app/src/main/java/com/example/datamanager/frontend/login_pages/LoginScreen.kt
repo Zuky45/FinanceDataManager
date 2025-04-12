@@ -18,9 +18,16 @@ import androidx.navigation.NavController
 import com.example.datamanager.R
 import com.example.datamanager.mid.login_pages.LoginModelHandler
 
+/**
+ * Composable function that represents the login screen.
+ *
+ * @param navController The navigation controller used to navigate between screens.
+ * @param modifier The modifier to be applied to the root composable.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
+    // ViewModel to handle login logic
     val modelHandler: LoginModelHandler = viewModel()
     val email by modelHandler.email.collectAsState()
     val password by modelHandler.password.collectAsState()
@@ -29,7 +36,7 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
     val invalidUser by modelHandler.invalidUser.collectAsState()
     var isLoginError by rememberSaveable { mutableStateOf(false) }
 
-    // Handle successful login
+    // Navigate to the main screen on successful login
     LaunchedEffect(loginSuccess) {
         if (loginSuccess) {
             navController.navigate("main")
@@ -37,6 +44,7 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
         }
     }
 
+    // Define the theme and layout for the login screen
     MaterialTheme(colorScheme = customColors) {
         Surface(
             modifier = modifier.fillMaxSize(),
@@ -49,6 +57,7 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+                // App name displayed at the top
                 Text(
                     text = stringResource(R.string.app_name),
                     style = MaterialTheme.typography.headlineLarge,
@@ -56,6 +65,7 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
                     modifier = Modifier.padding(bottom = 32.dp)
                 )
 
+                // Email input field
                 OutlinedTextField(
                     value = email,
                     onValueChange = {
@@ -68,7 +78,6 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
                     supportingText = {
                         if (email.isNotEmpty() && !modelHandler.isEmailValid(email)) {
                             Text(stringResource(R.string.invalid_email), color = MaterialTheme.colorScheme.error)
-
                         }
                     },
                     leadingIcon = { Icon(Icons.Default.Email, stringResource(R.string.icon_email)) },
@@ -77,6 +86,7 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
                         .padding(bottom = 16.dp)
                 )
 
+                // Password input field
                 OutlinedTextField(
                     value = password,
                     onValueChange = {
@@ -88,14 +98,12 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
                     visualTransformation = PasswordVisualTransformation(),
                     isError = isLoginError,
                     supportingText = {
-
                         if (invalidUser) {
                             Text(
                                 text = stringResource(R.string.invalid_credentials),
                                 color = MaterialTheme.colorScheme.error
                             )
                         }
-
                     },
                     leadingIcon = { Icon(Icons.Default.Lock, stringResource(R.string.icon_password)) },
                     modifier = Modifier
@@ -103,6 +111,7 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
                         .padding(bottom = 24.dp)
                 )
 
+                // Login button
                 Button(
                     onClick = {
                         if (modelHandler.validateCredentials(email, password)) {
@@ -130,6 +139,7 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
                     }
                 }
 
+                // Button to navigate to the account creation screen
                 TextButton(
                     onClick = { navController.navigate("new_account") },
                     modifier = Modifier.padding(top = 16.dp),
@@ -140,6 +150,7 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
                     Text(stringResource(R.string.create_new_account))
                 }
 
+                // Loading indicator displayed when login is in progress
                 AnimatedVisibility(visible = isLoading) {
                     LinearProgressIndicator(
                         modifier = Modifier
