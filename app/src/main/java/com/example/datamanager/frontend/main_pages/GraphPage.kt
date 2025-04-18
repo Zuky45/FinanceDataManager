@@ -29,9 +29,9 @@ fun GraphPage(
     navController: NavController,
     stockSymbol: String = "AAPL",
     stockViewModel: StockModelHandler = viewModel(),
-    approximationViewModel: ApproximationModelHandler = viewModel(),
     maFiltrationViewModel: MaFiltrationModelHandler = viewModel()
 ) {
+    val approximationViewModel = ApproximationModelHandler.getInstance()
     // Stock data state
     val stockData by stockViewModel.stockData.collectAsState()
     val isLoading by stockViewModel.isLoading.collectAsState()

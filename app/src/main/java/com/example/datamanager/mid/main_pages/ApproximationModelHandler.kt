@@ -81,4 +81,15 @@ class ApproximationModelHandler : ModelHandler() {
             getError().value = "Error calculating approximation: ${e.message}"
         }
     }
+
+    companion object {
+        @Volatile
+        private var instance: ApproximationModelHandler? = null
+
+        fun getInstance(): ApproximationModelHandler {
+            return instance ?: synchronized(this) {
+                instance ?: ApproximationModelHandler().also { instance = it }
+            }
+        }
+    }
 }

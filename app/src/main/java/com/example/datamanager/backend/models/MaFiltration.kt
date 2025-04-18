@@ -10,17 +10,17 @@ import com.example.datamanager.backend.api_manager.StockEntry
  * This class implements a moving average filter that smooths time series data
  * by averaging values within a sliding window of configurable size.
  *
- * @param _data The DataFrame containing time series data to be filtered
- * @param _windowSize The size of the moving average window (default: 3)
- * @param _columnToFilter The name of the column to apply filtration to (default: "Price")
+ * @param dataFrame The DataFrame containing time series data to be filtered
+ * @param windowSize The size of the moving average window (default: 3)
+ * @param columnToFilter The name of the column to apply filtration to (default: "Price")
  */
 class MaFiltration(
-    private val _data: DataFrame<StockEntry>,
-    private val _windowSize: Int = 3,
-    private val _columnToFilter: String = "Price"
-) : Model("MA Filtration") {
+    dataFrame: DataFrame<StockEntry>,
+    private val windowSize: Int = 3,
+    private val columnToFilter: String = "Price"
+) : Model("MA Filtration", dataFrame) {
 
-    private var _filteredData: DataFrame<*>? = null
+    private var filteredData: DataFrame<*>? = null
 
     /**
      * Calculates the moving average filtration model.
@@ -29,18 +29,19 @@ class MaFiltration(
      * and stores the result in filteredData.
      */
     override fun calculateModel() {
-        if (_data.rowsCount() < _windowSize) {
-            throw IllegalArgumentException("Data size (${_data.rowsCount()}) must be greater than or equal to window size ($_windowSize)")
+        val dataFrame = getDataFrame()
+        if (dataFrame == null || dataFrame.rowsCount() < windowSize) {
+            throw IllegalArgumentException("Data size (${dataFrame?.rowsCount() ?: 0}) must be greater than or equal to window size ($windowSize)")
         }
 
-        val originalValues = _data[_columnToFilter].toList().mapNotNull { it as? Double }
-        val filteredValues = applyMovingAverage(originalValues, _windowSize)
-        val timeColumn = _data["Time"].map { it }
+        val originalValues = dataFrame[columnToFilter].toList().mapNotNull { it as? Double }
+        val filteredValues = applyMovingAverage(originalValues, windowSize)
+        val timeColumn = dataFrame["Time"].map { it }
 
         // Create a new DataFrame with the filtered values
-        var timeList = timeColumn.toList();
-        timeList = timeList.subList(_windowSize - 1, timeList.size)
-        _filteredData = dataFrameOf("Time" to timeList, "MaFiltration" to filteredValues)
+        var timeList = timeColumn.toList()
+        timeList = timeList.subList(windowSize - 1, timeList.size)
+        filteredData = dataFrameOf("Time" to timeList, "MaFiltration" to filteredValues)
     }
 
     /**
@@ -49,7 +50,7 @@ class MaFiltration(
      * @return DataFrame containing the original data and filtered values
      */
     override fun getModel(): DataFrame<*>? {
-        return _filteredData
+        return filteredData
     }
 
     /**
@@ -70,5 +71,4 @@ class MaFiltration(
 
         return result
     }
-
 }

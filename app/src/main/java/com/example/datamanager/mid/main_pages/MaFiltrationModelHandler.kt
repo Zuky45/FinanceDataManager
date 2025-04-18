@@ -1,7 +1,6 @@
 package com.example.datamanager.mid.main_pages
 
 import android.util.Log
-import androidx.lifecycle.viewModelScope
 import com.example.datamanager.backend.api_manager.StockEntry
 import com.example.datamanager.backend.models.MaFiltration
 import kotlinx.coroutines.flow.MutableStateFlow

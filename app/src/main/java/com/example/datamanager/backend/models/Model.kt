@@ -1,7 +1,5 @@
 package com.example.datamanager.backend.models
 
-import com.example.datamanager.backend.api_manager.ApiManager
-import org.jetbrains.kotlinx.dataframe.DataColumn
 import org.jetbrains.kotlinx.dataframe.DataFrame
 import org.jetbrains.kotlinx.dataframe.api.map
 import org.jetbrains.kotlinx.dataframe.api.maxOrNull
@@ -11,10 +9,10 @@ import kotlin.collections.average
 /**
  * Abstract class representing a data model.
  *
- * @property name The name of the model.
- * @property dataFrame The data frame associated with the model, default is null.
+ * @property _name The name of the model.
+ * @property _dataFrame The data frame associated with the model, default is null.
  */
-abstract class Model(private val name: String, private val dataFrame: DataFrame<*>? = null) {
+abstract class Model(private val _name: String, private val _dataFrame: DataFrame<*>? = null) {
 
     /**
      * Abstract method to calculate the model. Must be implemented by subclasses.
@@ -34,7 +32,7 @@ abstract class Model(private val name: String, private val dataFrame: DataFrame<
      * @return The name of the model.
      */
     fun getName(): String {
-        return name
+        return _name
     }
 
     /**
@@ -43,7 +41,7 @@ abstract class Model(private val name: String, private val dataFrame: DataFrame<
      * @return The data frame, or null if not set.
      */
     protected fun getDataFrame(): DataFrame<*>? {
-        return dataFrame
+        return _dataFrame
     }
 
     /**
@@ -52,8 +50,8 @@ abstract class Model(private val name: String, private val dataFrame: DataFrame<
      * @return The average value, or 0.0 if the column is not present or the data frame is empty.
      */
     fun calculateAverage(): Double {
-        return if (dataFrame != null && dataFrame.rowsCount() > 0 && "Price" in dataFrame.columnNames()) {
-            val priceValues = dataFrame["Price"].map { it.toString().toDoubleOrNull() ?: 0.0 }
+        return if (_dataFrame != null && _dataFrame.rowsCount() > 0 && "Price" in _dataFrame.columnNames()) {
+            val priceValues = _dataFrame["Price"].map { it.toString().toDoubleOrNull() ?: 0.0 }
             priceValues.toList().average()
         } else {
             0.0
@@ -67,8 +65,8 @@ abstract class Model(private val name: String, private val dataFrame: DataFrame<
      * @return The largest value, or 0.0 if the column is not present or the data frame is empty.
      */
     fun getBiggestValue(columnName: String): Double {
-        return if (dataFrame != null && dataFrame.rowsCount() > 0 && columnName in dataFrame.columnNames()) {
-            val column = dataFrame[columnName].map { it.toString().toDoubleOrNull() ?: 0.0 }
+        return if (_dataFrame != null && _dataFrame.rowsCount() > 0 && columnName in _dataFrame.columnNames()) {
+            val column = _dataFrame[columnName].map { it.toString().toDoubleOrNull() ?: 0.0 }
             val maxValue = column.maxOrNull()
             maxValue ?: 0.0
         } else {
@@ -83,8 +81,8 @@ abstract class Model(private val name: String, private val dataFrame: DataFrame<
      * @return The smallest value, or 0.0 if the column is not present or the data frame is empty.
      */
     fun getLowestValue(columnName: String): Double {
-        return if (dataFrame != null && dataFrame.rowsCount() > 0 && columnName in dataFrame.columnNames()) {
-            val column = dataFrame[columnName].map { it.toString().toDoubleOrNull() ?: 0.0 }
+        return if (_dataFrame != null && _dataFrame.rowsCount() > 0 && columnName in _dataFrame.columnNames()) {
+            val column = _dataFrame[columnName].map { it.toString().toDoubleOrNull() ?: 0.0 }
             val minValue = column.minOrNull()
             minValue ?: 0.0
         } else {
