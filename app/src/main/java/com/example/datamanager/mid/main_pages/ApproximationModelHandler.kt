@@ -27,6 +27,7 @@ class ApproximationModelHandler : ModelHandler() {
 
     // Default polynomial degree
     private var _degree = MutableStateFlow<Int>(1)
+    val degree: StateFlow<Int> = _degree.asStateFlow()
 
     /**
      * Sets the polynomial degree for the approximation.
