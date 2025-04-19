@@ -26,6 +26,12 @@ import android.graphics.Color as AndroidColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+        /**
+         * Composable function to display the details page for polynomial approximation.
+         *
+         * @param navController The NavController used for navigation.
+         * @param approximationHandler The handler responsible for managing the approximation model data.
+         */
 fun ApproximationDetailsPage(
     navController: NavController,
     approximationHandler: ApproximationModelHandler
@@ -37,6 +43,7 @@ fun ApproximationDetailsPage(
 
     Scaffold(
         topBar = {
+            // Top app bar with a title and back navigation
             SmallTopAppBar(
                 title = { Text("Polynomial Approximation") },
                 navigationIcon = {
@@ -58,6 +65,7 @@ fun ApproximationDetailsPage(
                 .background(DarkThemeColors.background)
                 .padding(16.dp)
         ) {
+            // Display a "No Data" view if data is unavailable, otherwise show the content
             if (dataFrame == null || coefficients == null) {
                 NoDataView()
             } else {
@@ -71,15 +79,21 @@ fun ApproximationDetailsPage(
     }
 }
 
-
 @Composable
+/**
+ * Composable function to display the content of the approximation details page.
+ *
+ * @param degree The degree of the polynomial approximation.
+ * @param coefficients The coefficients of the polynomial equation.
+ * @param dataFrame The data frame containing the approximation data.
+ */
 private fun ApproximationContent(
     degree: Int,
     coefficients: DoubleArray,
     dataFrame: DataFrame<*>
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        // Polynomial model card
+        // Polynomial model card displaying degree, equation, and coefficients
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = DarkThemeColors.surface)
@@ -126,7 +140,7 @@ private fun ApproximationContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Graph card
+        // Graph card displaying the approximation chart
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -156,7 +170,7 @@ private fun ApproximationContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Data table
+        // Data table displaying the approximation data
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -215,7 +229,10 @@ private fun ApproximationContent(
 }
 
 /**
- * Updates the chart with approximation data only
+ * Updates the chart with approximation data only.
+ *
+ * @param chart The LineChart instance to update.
+ * @param dataFrame The data frame containing the approximation data.
  */
 private fun updateApproximationChart(chart: LineChart, dataFrame: DataFrame<*>) {
     val entries = ArrayList<Entry>()
@@ -239,7 +256,10 @@ private fun updateApproximationChart(chart: LineChart, dataFrame: DataFrame<*>) 
 }
 
 /**
- * Formats polynomial equation from coefficients
+ * Formats a polynomial equation from the given coefficients.
+ *
+ * @param coefficients The array of coefficients for the polynomial equation.
+ * @return A string representation of the polynomial equation.
  */
 private fun formatPolynomialEquation(coefficients: DoubleArray): String {
     val terms = coefficients.mapIndexed { index, coef ->

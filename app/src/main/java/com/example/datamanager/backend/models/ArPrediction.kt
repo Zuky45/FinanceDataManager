@@ -5,23 +5,56 @@ import org.apache.commons.math3.stat.regression.OLSMultipleLinearRegression
 import org.jetbrains.kotlinx.dataframe.DataFrame
 import org.jetbrains.kotlinx.dataframe.api.*
 
-class ArPrediction(dataFrame: DataFrame<*>? = null,
-                   private var order: Int = 5,
-                   private var predictionHorizon: Int = 10) : Model("AR Prediction", dataFrame) {
+/**
+ * Represents an Auto-Regressive (AR) prediction model.
+ *
+ * @property order The number of previous data points used for prediction. Must be >= 1.
+ * @property predictionHorizon The number of future data points to predict. Must be >= 1.
+ * @constructor Initializes the AR prediction model with an optional DataFrame, order, and prediction horizon.
+ */
+class ArPrediction(
+    dataFrame: DataFrame<*>? = null,
+    private var order: Int = 5,
+    private var predictionHorizon: Int = 10
+) : Model("AR Prediction", dataFrame) {
 
-    private var _predictionModel: DataFrame<*>? = null
-    private var _coefficients: DoubleArray? = null
+    private var _predictionModel: DataFrame<*>? = null // Holds the resulting prediction model as a DataFrame.
+    private var _coefficients: DoubleArray? = null // Stores the coefficients of the AR model.
 
+    /**
+     * Sets the order of the AR model.
+     *
+     * @param order The number of previous data points to use. Must be positive.
+     * @throws IllegalArgumentException if the order is less than 1.
+     */
     fun setOrder(order: Int) {
         if (order < 1) throw IllegalArgumentException("Order must be positive")
         this.order = order
     }
 
+    /**
+     * Sets the prediction horizon for the AR model.
+     *
+     * @param horizon The number of future data points to predict. Must be positive.
+     * @throws IllegalArgumentException if the prediction horizon is less than 1.
+     */
     fun setPredictionHorizon(horizon: Int) {
         if (horizon < 1) throw IllegalArgumentException("Prediction horizon must be positive")
         this.predictionHorizon = horizon
     }
 
+    /**
+     * Calculates the AR prediction model based on the input DataFrame.
+     *
+     * - Extracts time and value columns from the DataFrame.
+     * - Fits an AR model to the data using the specified order.
+     * - Generates future predictions based on the fitted model.
+     * - Creates a new DataFrame containing the prediction times and values.
+     *
+     * Preconditions:
+     * - The DataFrame must not be null.
+     * - The DataFrame must have more rows than the specified order.
+     */
     override fun calculateModel() {
         val dataFrame = getDataFrame()
         if (dataFrame != null && dataFrame.rowsCount() > order) {
@@ -53,14 +86,31 @@ class ArPrediction(dataFrame: DataFrame<*>? = null,
         }
     }
 
+    /**
+     * Retrieves the calculated AR prediction model as a DataFrame.
+     *
+     * @return The prediction model DataFrame, or null if the model has not been calculated.
+     */
     override fun getModel(): DataFrame<*>? {
         return _predictionModel
     }
 
+    /**
+     * Retrieves the coefficients of the AR model.
+     *
+     * @return An array of AR model coefficients, or null if the model has not been calculated.
+     */
     fun getCoefficients(): DoubleArray? {
         return _coefficients
     }
 
+    /**
+     * Fits an AR model to the given data using Ordinary Least Squares (OLS) regression.
+     *
+     * @param data The list of data points to fit the model to.
+     * @param order The number of previous data points to use for the AR model.
+     * @return An array of regression coefficients, including the intercept.
+     */
     private fun fitArModel(data: List<Double>, order: Int): DoubleArray {
         val regression = OLSMultipleLinearRegression()
 
@@ -80,6 +130,14 @@ class ArPrediction(dataFrame: DataFrame<*>? = null,
         return regression.estimateRegressionParameters()
     }
 
+    /**
+     * Generates future predictions based on the AR model coefficients.
+     *
+     * @param data The list of historical data points.
+     * @param coefficients The AR model coefficients, including the intercept.
+     * @param horizon The number of future data points to predict.
+     * @return A list of predicted values.
+     */
     private fun generatePredictions(
         data: List<Double>,
         coefficients: DoubleArray,
@@ -102,37 +160,5 @@ class ArPrediction(dataFrame: DataFrame<*>? = null,
         }
 
         return result
-    }
-}
-fun main() {
-    kotlinx.coroutines.runBlocking {
-        // Fetch real stock data
-        val apiManager = ApiManager()
-        val dataFrame = apiManager.fetchData("AAPL")
-
-        if (dataFrame != null) {
-            println("Fetched data: ${dataFrame.rowsCount()} rows")
-
-            // Create AR prediction model
-            val arModel = ArPrediction(dataFrame)
-
-            // Set parameters
-            arModel.setOrder(5)  // Use 5 previous values
-            arModel.setPredictionHorizon(10)  // Predict 10 steps ahead
-
-            // Calculate model
-            arModel.calculateModel()
-
-            // Print results
-            println("AR Model Coefficients: ${arModel.getCoefficients()?.joinToString()}")
-            println("Predictions:")
-            arModel.getModel()?.let { predictions ->
-                for (i in 0 until predictions.rowsCount()) {
-                    println("Time: ${predictions["Time"][i]}, Predicted Value: ${predictions["Prediction"][i]}")
-                }
-            }
-        } else {
-            println("Failed to fetch data")
-        }
     }
 }

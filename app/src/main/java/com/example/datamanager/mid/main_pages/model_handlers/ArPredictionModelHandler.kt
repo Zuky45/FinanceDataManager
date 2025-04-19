@@ -8,6 +8,11 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.jetbrains.kotlinx.dataframe.DataFrame
 
+/**
+ * Handler class for managing the Auto-Regressive (AR) Prediction model.
+ * This class provides functionality to load stock data, calculate AR predictions,
+ * and manage related state flows.
+ */
 class ArPredictionModelHandler : ModelHandler() {
     // MutableStateFlow to hold the stock data for calculation
     private val _stockData = MutableStateFlow<DataFrame<StockEntry>?>(null)
@@ -32,7 +37,7 @@ class ArPredictionModelHandler : ModelHandler() {
     /**
      * Sets the AR order for the prediction.
      *
-     * @param newOrder The order of AR model to use for prediction
+     * @param newOrder The order of the AR model to use for prediction.
      */
     fun setOrder(newOrder: Int) {
         if (newOrder > 0) {
@@ -47,7 +52,7 @@ class ArPredictionModelHandler : ModelHandler() {
     /**
      * Sets the prediction horizon (number of data points to predict).
      *
-     * @param horizon The number of data points to predict
+     * @param horizon The number of data points to predict.
      */
     fun setPredictionHorizon(horizon: Int) {
         if (horizon > 0) {
@@ -61,7 +66,8 @@ class ArPredictionModelHandler : ModelHandler() {
 
     /**
      * Loads and calculates the AR prediction model for the specified stock symbol.
-     * @param symbol The stock symbol to calculate AR prediction for
+     *
+     * @param symbol The stock symbol to calculate AR prediction for.
      */
     fun loadArPrediction(symbol: String) {
         loadData {
@@ -81,7 +87,7 @@ class ArPredictionModelHandler : ModelHandler() {
     /**
      * Calculates AR prediction for the given stock data.
      *
-     * @param stockData The DataFrame containing stock entries for prediction
+     * @param stockData The DataFrame containing stock entries for prediction.
      */
     private fun calculateArPrediction(stockData: DataFrame<StockEntry>) {
         try {
@@ -114,6 +120,11 @@ class ArPredictionModelHandler : ModelHandler() {
         @Volatile
         private var instance: ArPredictionModelHandler? = null
 
+        /**
+         * Retrieves the singleton instance of the ArPredictionModelHandler.
+         *
+         * @return The singleton instance of ArPredictionModelHandler.
+         */
         fun getInstance(): ArPredictionModelHandler {
             return instance ?: synchronized(this) {
                 instance ?: ArPredictionModelHandler().also { instance = it }

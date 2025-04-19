@@ -26,8 +26,11 @@ fun reloadModelData(
     modelHandler: ModelHandler?
 ) {
     when (modelType) {
+        // Reloads data for the Approximation model
         ModelType.APPROXIMATION -> (modelHandler as? ApproximationModelHandler)?.loadApproximation(symbol)
+        // Reloads data for the Moving Average Filtration model
         ModelType.MAFILTRATION -> (modelHandler as? MaFiltrationModelHandler)?.loadMaFiltration(symbol)
+        // Reloads data for the Auto-Regressive Prediction model
         ModelType.ARPREDICTION -> (modelHandler as? ArPredictionModelHandler)?.loadArPrediction(symbol)
         else -> {}
     }
@@ -51,7 +54,7 @@ fun updateChartData(
 ) {
     val dataSets = ArrayList<ILineDataSet>()
 
-    // Add stock data
+    // Add stock data to the chart
     val stockEntries = ArrayList<Entry>()
     for (i in 0 until dataFrame.rowsCount()) {
         val price = dataFrame["Price"][i].toString().toFloatOrNull() ?: 0f
@@ -59,20 +62,20 @@ fun updateChartData(
     }
 
     val stockDataSet = LineDataSet(stockEntries, "Price").apply {
-        color = AndroidColor.rgb(66, 134, 244)
-        valueTextColor = AndroidColor.WHITE
-        lineWidth = 2f
-        setDrawCircles(false)
-        setDrawValues(false)
-        mode = LineDataSet.Mode.CUBIC_BEZIER
-        setDrawFilled(true)
-        fillColor = AndroidColor.rgb(66, 134, 244)
-        fillAlpha = 50
+        color = AndroidColor.rgb(66, 134, 244) // Set line color
+        valueTextColor = AndroidColor.WHITE // Set text color
+        lineWidth = 2f // Set line width
+        setDrawCircles(false) // Disable circles on data points
+        setDrawValues(false) // Disable value labels
+        mode = LineDataSet.Mode.CUBIC_BEZIER // Use cubic bezier for smooth lines
+        setDrawFilled(true) // Enable filled area under the line
+        fillColor = AndroidColor.rgb(66, 134, 244) // Set fill color
+        fillAlpha = 50 // Set fill transparency
     }
 
     dataSets.add(stockDataSet)
 
-    // Add model data if available
+    // Add model data to the chart if available
     if (modelDataFrame != null && modelColumnName.isNotEmpty()) {
         try {
             if (hasColumn(modelDataFrame, modelColumnName)) {
@@ -84,7 +87,7 @@ fun updateChartData(
                 for (i in 0 until modelDataFrame.rowsCount()) {
                     val value = modelDataFrame[modelColumnName][i].toString().toFloatOrNull() ?: 0f
 
-                    // For AR prediction, adjust the x-value to start from the correct position
+                    // Adjust x-value for AR prediction
                     val xValue = if (modelName == "AR Prediction") {
                         (i + startIndex).toFloat()
                     } else {
@@ -95,12 +98,12 @@ fun updateChartData(
                 }
 
                 val modelDataSet = LineDataSet(modelEntries, modelName).apply {
-                    color = AndroidColor.rgb(255, 89, 94)
-                    valueTextColor = AndroidColor.WHITE
-                    lineWidth = 2f
-                    setDrawCircles(false)
-                    setDrawValues(false)
-                    mode = LineDataSet.Mode.CUBIC_BEZIER
+                    color = AndroidColor.rgb(255, 89, 94) // Set line color
+                    valueTextColor = AndroidColor.WHITE // Set text color
+                    lineWidth = 2f // Set line width
+                    setDrawCircles(false) // Disable circles on data points
+                    setDrawValues(false) // Disable value labels
+                    mode = LineDataSet.Mode.CUBIC_BEZIER // Use cubic bezier for smooth lines
                 }
                 dataSets.add(modelDataSet)
             }
@@ -109,8 +112,9 @@ fun updateChartData(
         }
     }
 
+    // Update the chart with the new data
     chart.data = LineData(dataSets)
-    chart.invalidate()
+    chart.invalidate() // Refresh the chart
 }
 
 /**
@@ -124,9 +128,9 @@ fun hasColumn(dataFrame: DataFrame<*>?, columnName: String): Boolean {
     if (dataFrame == null || columnName.isEmpty()) return false
 
     return try {
-        dataFrame[columnName]
-        true
+        dataFrame[columnName] // Attempt to access the column
+        true // Column exists
     } catch (e: Exception) {
-        false
+        false // Column does not exist
     }
 }

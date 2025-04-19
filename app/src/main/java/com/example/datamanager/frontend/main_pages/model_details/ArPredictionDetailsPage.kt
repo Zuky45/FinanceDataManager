@@ -26,6 +26,12 @@ import java.text.DecimalFormat
 import android.graphics.Color as AndroidColor
 
 @OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Composable function to display the details page for the AR Prediction model.
+ *
+ * @param navController The NavController used for navigation.
+ * @param arPredictionHandler The handler responsible for managing AR Prediction model data.
+ */
 @Composable
 fun ArPredictionDetailsPage(
     navController: NavController,
@@ -41,6 +47,7 @@ fun ArPredictionDetailsPage(
 
     Scaffold(
         topBar = {
+            // Top app bar with a title and back navigation
             SmallTopAppBar(
                 title = { Text("AR Prediction Model") },
                 navigationIcon = {
@@ -62,9 +69,11 @@ fun ArPredictionDetailsPage(
                 .background(DarkThemeColors.background)
                 .padding(16.dp)
         ) {
+            // Display a "No Data" view if prediction data or coefficients are unavailable
             if (predictionData == null || coefficients == null) {
                 NoDataView()
             } else {
+                // Display the AR Prediction content
                 ArPredictionContent(
                     order = order,
                     horizon = horizon,
@@ -78,6 +87,16 @@ fun ArPredictionDetailsPage(
     }
 }
 
+/**
+ * Composable function to display the content of the AR Prediction details page.
+ *
+ * @param order The order of the AR model.
+ * @param horizon The prediction horizon for the AR model.
+ * @param coefficients The coefficients of the AR model.
+ * @param stockData The data frame containing stock data (optional).
+ * @param predictionData The data frame containing prediction data.
+ * @param formatter The DecimalFormat instance for formatting coefficient values.
+ */
 @Composable
 private fun ArPredictionContent(
     order: Int,
@@ -88,7 +107,7 @@ private fun ArPredictionContent(
     formatter: DecimalFormat
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        // AR model info card
+        // AR model information card
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = DarkThemeColors.surface)
@@ -138,7 +157,7 @@ private fun ArPredictionContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Graph card
+        // Graph card displaying the AR prediction chart
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -168,7 +187,7 @@ private fun ArPredictionContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Data table
+        // Data table displaying prediction data
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -227,7 +246,10 @@ private fun ArPredictionContent(
 }
 
 /**
- * Updates the chart with AR prediction data
+ * Updates the chart with AR prediction data.
+ *
+ * @param chart The LineChart instance to update.
+ * @param dataFrame The data frame containing AR prediction data.
  */
 private fun updateArPredictionChart(chart: LineChart, dataFrame: DataFrame<*>) {
     val entries = ArrayList<Entry>()

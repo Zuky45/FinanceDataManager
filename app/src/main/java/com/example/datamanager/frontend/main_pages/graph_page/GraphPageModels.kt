@@ -34,6 +34,7 @@ enum class ModelType(val displayName: String) {
     /** Represents a moving average filtration model. */
     MAFILTRATION("Moving Average"),
 
+    /** Represents an auto-regressive prediction model. */
     ARPREDICTION("AR Prediction");
 
     /**

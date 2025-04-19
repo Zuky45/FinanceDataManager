@@ -25,6 +25,12 @@ import org.jetbrains.kotlinx.dataframe.DataFrame
 import android.graphics.Color as AndroidColor
 
 @OptIn(ExperimentalMaterial3Api::class)
+/**
+ * Composable function to display the details page for the Moving Average (MA) Filtration model.
+ *
+ * @param navController The NavController used for navigation.
+ * @param maFiltrationModelHandler The handler responsible for managing MA Filtration model data.
+ */
 @Composable
 fun MaFiltrationDetailsPage(
     navController: NavController,
@@ -36,6 +42,7 @@ fun MaFiltrationDetailsPage(
 
     Scaffold(
         topBar = {
+            // Top app bar with a title and back navigation
             SmallTopAppBar(
                 title = { Text("MA Filtration") },
                 navigationIcon = {
@@ -57,6 +64,7 @@ fun MaFiltrationDetailsPage(
                 .background(DarkThemeColors.background)
                 .padding(16.dp)
         ) {
+            // Display a "No Data" view if data is unavailable, otherwise show the content
             if (dataFrame == null) {
                 NoDataView()
             } else {
@@ -69,13 +77,19 @@ fun MaFiltrationDetailsPage(
     }
 }
 
-
+/**
+ * Composable function to display the content of the MA Filtration details page.
+ *
+ * @param windowSize The size of the moving average window.
+ * @param dataFrame The data frame containing the MA Filtration data.
+ */
 @Composable
 private fun MaFiltrationContent(
     windowSize: Int,
     dataFrame: DataFrame<*>
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
+        // Card displaying the window size
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = DarkThemeColors.surface)
@@ -88,14 +102,12 @@ private fun MaFiltrationContent(
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
-
-
             }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Graph card
+        // Graph card displaying the MA Filtration chart
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -125,7 +137,7 @@ private fun MaFiltrationContent(
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        // Data table
+        // Data table displaying the MA Filtration data
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -184,7 +196,10 @@ private fun MaFiltrationContent(
 }
 
 /**
- * Updates the chart with approximation data only
+ * Updates the chart with MA Filtration data.
+ *
+ * @param chart The LineChart instance to update.
+ * @param dataFrame The data frame containing the MA Filtration data.
  */
 private fun updateFiltrationChart(chart: LineChart, dataFrame: DataFrame<*>) {
     val entries = ArrayList<Entry>()
@@ -196,13 +211,13 @@ private fun updateFiltrationChart(chart: LineChart, dataFrame: DataFrame<*>) {
     }
 
     val dataSet = LineDataSet(entries, "MA Filtration").apply {
-        color = AndroidColor.rgb(255, 165, 0)
-        lineWidth = 2.5f
-        setDrawCircles(false)
-        mode = LineDataSet.Mode.CUBIC_BEZIER
-        setDrawValues(false)
+        color = AndroidColor.rgb(255, 165, 0) // Orange color for the line
+        lineWidth = 2.5f // Set line width
+        setDrawCircles(false) // Disable circles on data points
+        mode = LineDataSet.Mode.CUBIC_BEZIER // Use cubic bezier for smooth lines
+        setDrawValues(false) // Disable value labels
     }
 
     chart.data = LineData(dataSet)
-    chart.invalidate()
+    chart.invalidate() // Refresh the chart
 }

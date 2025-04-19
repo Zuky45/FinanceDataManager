@@ -1,3 +1,8 @@
+/**
+ * This file contains composable functions for displaying model controls in the graph page.
+ * It provides user interface elements for selecting parameters and interacting with different
+ * analytical models (Approximation, Moving Average Filtration, and AR Prediction).
+ */
 package com.example.datamanager.frontend.main_pages.graph_page
 
 import androidx.compose.foundation.layout.*
@@ -18,6 +23,7 @@ import com.example.datamanager.mid.main_pages.model_handlers.MaFiltrationModelHa
  * @param selectedModel The currently selected model type.
  * @param approximationViewModel The ViewModel for handling approximation model logic.
  * @param maFiltrationViewModel The ViewModel for handling moving average filtration logic.
+ * @param arPredictionViewModel The ViewModel for handling AR prediction model logic.
  * @param navController The navigation controller for handling navigation actions.
  */
 @Composable
@@ -69,7 +75,7 @@ fun ApproximationControls(
     viewModel: ApproximationModelHandler,
     navController: NavController
 ) {
-    val degreeOptions = listOf(2, 3, 4, 5, 6) // Available degree options for the model
+    val degreeOptions = listOf(1,2, 3, 4, 5, 6) // Available degree options for the model
     var expandedDegree by remember { mutableStateOf(false) } // State to track dropdown menu visibility
     val selectedDegree by viewModel.degree.collectAsState() // Currently selected degree
     val approximationData by viewModel.approximationData.collectAsState() // Current approximation data
@@ -130,6 +136,7 @@ fun ApproximationControls(
  * Composable function to display controls for the moving average filtration model.
  *
  * @param viewModel The ViewModel for handling moving average filtration logic.
+ * @param navController The navigation controller for handling navigation to details page.
  */
 @Composable
 fun MaFiltrationControls(
@@ -144,38 +151,38 @@ fun MaFiltrationControls(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-    Box {
-        // Button to display the dropdown menu for selecting a window size
-        OutlinedButton(
-            onClick = { expandedWindowSize = true },
-            colors = ButtonDefaults.outlinedButtonColors(
-                contentColor = DarkThemeColors.onBackground
-            ),
-            border = ButtonDefaults.outlinedButtonBorder.copy(
-                brush = SolidColor(DarkThemeColors.onBackground)
-            )
-        ) {
-            Text("Window Size: $selectedWindowSize")
-        }
-
-        // Dropdown menu for selecting a window size
-        DropdownMenu(
-            expanded = expandedWindowSize,
-            onDismissRequest = { expandedWindowSize = false }
-        ) {
-            windowSizeOptions.forEach { size ->
-                DropdownMenuItem(
-                    text = { Text("$size") },
-                    onClick = {
-                        viewModel.setWindowSize(size) // Update the selected window size in the ViewModel
-                        expandedWindowSize = false
-                    }
+        Box {
+            // Button to display the dropdown menu for selecting a window size
+            OutlinedButton(
+                onClick = { expandedWindowSize = true },
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = DarkThemeColors.onBackground
+                ),
+                border = ButtonDefaults.outlinedButtonBorder.copy(
+                    brush = SolidColor(DarkThemeColors.onBackground)
                 )
-
+            ) {
+                Text("Window Size: $selectedWindowSize")
             }
-        }
 
-    }
+            // Dropdown menu for selecting a window size
+            DropdownMenu(
+                expanded = expandedWindowSize,
+                onDismissRequest = { expandedWindowSize = false }
+            ) {
+                windowSizeOptions.forEach { size ->
+                    DropdownMenuItem(
+                        text = { Text("$size") },
+                        onClick = {
+                            viewModel.setWindowSize(size) // Update the selected window size in the ViewModel
+                            expandedWindowSize = false
+                        }
+                    )
+
+                }
+            }
+
+        }
         Button(
             onClick = {
                 navController.navigate("filtration_details")
@@ -191,19 +198,26 @@ fun MaFiltrationControls(
     }
 }
 
+/**
+ * Composable function to display controls for the AR (Auto-Regressive) prediction model.
+ * Provides UI elements for adjusting model parameters and navigating to detailed results.
+ *
+ * @param viewModel The ViewModel for handling AR prediction model logic.
+ * @param navController The navigation controller for handling navigation to details page.
+ */
 @Composable
 fun ArPredictionControls(
     viewModel: ArPredictionModelHandler,
     navController: NavController
 ) {
-    val orderOptions = (1..30).toList()
-    val horizonOptions = listOf(5, 10, 15, 20, 30)
-    var expandedOrder by remember { mutableStateOf(false) }
-    var expandedHorizon by remember { mutableStateOf(false) }
-    val selectedOrder by viewModel.order.collectAsState()
-    val selectedHorizon by viewModel.predictionHorizon.collectAsState()
-    val predictionData by viewModel.arPredictionData.collectAsState()
-    val coefficients by viewModel.coefficients.collectAsState()
+    val orderOptions = (1..30).toList() // Available order options for the AR model
+    val horizonOptions = listOf(5, 10, 15, 20, 30) // Available prediction horizon options
+    var expandedOrder by remember { mutableStateOf(false) } // State to track order dropdown menu visibility
+    var expandedHorizon by remember { mutableStateOf(false) } // State to track horizon dropdown menu visibility
+    val selectedOrder by viewModel.order.collectAsState() // Currently selected AR model order
+    val selectedHorizon by viewModel.predictionHorizon.collectAsState() // Currently selected prediction horizon
+    val predictionData by viewModel.arPredictionData.collectAsState() // Current prediction data
+    val coefficients by viewModel.coefficients.collectAsState() // Current AR model coefficients
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -268,14 +282,12 @@ fun ArPredictionControls(
                 }
             }
         }
-
-
     }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Details button
+        // Details button - only enabled when prediction data and coefficients are available
         Button(
             onClick = {
                 navController.navigate("ar_prediction_details")
