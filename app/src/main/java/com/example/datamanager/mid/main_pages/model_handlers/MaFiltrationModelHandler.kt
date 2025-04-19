@@ -1,4 +1,4 @@
-package com.example.datamanager.mid.main_pages
+package com.example.datamanager.mid.main_pages.model_handlers
 
 import android.util.Log
 import com.example.datamanager.backend.api_manager.StockEntry
@@ -85,4 +85,17 @@ class MaFiltrationModelHandler : ModelHandler() {
         _maFiltrationData.value = null
         getError().value = null
     }
+
+
+    companion object {
+        @Volatile
+        private var instance: MaFiltrationModelHandler? = null
+
+        fun getInstance(): MaFiltrationModelHandler {
+            return instance ?: synchronized(this) {
+                instance ?: MaFiltrationModelHandler().also { instance = it }
+            }
+        }
+    }
+
 }

@@ -2,9 +2,10 @@ package com.example.datamanager.frontend.main_pages.graph_page
 
 import android.graphics.Color as AndroidColor
 import com.example.datamanager.backend.api_manager.StockEntry
-import com.example.datamanager.mid.main_pages.ApproximationModelHandler
-import com.example.datamanager.mid.main_pages.MaFiltrationModelHandler
-import com.example.datamanager.mid.main_pages.ModelHandler
+import com.example.datamanager.mid.main_pages.model_handlers.ApproximationModelHandler
+import com.example.datamanager.mid.main_pages.model_handlers.ArPredictionModelHandler
+import com.example.datamanager.mid.main_pages.model_handlers.MaFiltrationModelHandler
+import com.example.datamanager.mid.main_pages.model_handlers.ModelHandler
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
@@ -27,6 +28,7 @@ fun reloadModelData(
     when (modelType) {
         ModelType.APPROXIMATION -> (modelHandler as? ApproximationModelHandler)?.loadApproximation(symbol)
         ModelType.MAFILTRATION -> (modelHandler as? MaFiltrationModelHandler)?.loadMaFiltration(symbol)
+        ModelType.ARPREDICTION -> (modelHandler as? ArPredictionModelHandler)?.loadArPrediction(symbol)
         else -> {}
     }
 }
@@ -75,9 +77,21 @@ fun updateChartData(
         try {
             if (hasColumn(modelDataFrame, modelColumnName)) {
                 val modelEntries = ArrayList<Entry>()
+
+                // Special handling for AR prediction - start from index 100
+                val startIndex = if (modelName == "AR Prediction") 100 else 0
+
                 for (i in 0 until modelDataFrame.rowsCount()) {
                     val value = modelDataFrame[modelColumnName][i].toString().toFloatOrNull() ?: 0f
-                    modelEntries.add(Entry(i.toFloat(), value))
+
+                    // For AR prediction, adjust the x-value to start from the correct position
+                    val xValue = if (modelName == "AR Prediction") {
+                        (i + startIndex).toFloat()
+                    } else {
+                        i.toFloat()
+                    }
+
+                    modelEntries.add(Entry(xValue, value))
                 }
 
                 val modelDataSet = LineDataSet(modelEntries, modelName).apply {

@@ -10,10 +10,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
-import com.example.datamanager.mid.main_pages.ApproximationModelHandler
-import com.example.datamanager.mid.main_pages.MaFiltrationModelHandler
-import com.example.datamanager.mid.main_pages.StockModelHandler
+import com.example.datamanager.mid.main_pages.model_handlers.ApproximationModelHandler
+import com.example.datamanager.mid.main_pages.model_handlers.MaFiltrationModelHandler
+import com.example.datamanager.mid.main_pages.model_handlers.StockModelHandler
 import com.example.datamanager.frontend.main_pages.graph_page.*
+import com.example.datamanager.mid.main_pages.model_handlers.ArPredictionModelHandler
 
 /**
  * Composable function to display the GraphPage, which includes stock data, model controls, and data visualization.
@@ -29,9 +30,10 @@ fun GraphPage(
     navController: NavController,
     stockSymbol: String = "AAPL",
     stockViewModel: StockModelHandler = viewModel(),
-    maFiltrationViewModel: MaFiltrationModelHandler = viewModel()
 ) {
+    val maFiltrationViewModel = MaFiltrationModelHandler.getInstance()
     val approximationViewModel = ApproximationModelHandler.getInstance()
+    val arPredictionViewModel = ArPredictionModelHandler.getInstance()
     // Stock data state
     val stockData by stockViewModel.stockData.collectAsState()
     val isLoading by stockViewModel.isLoading.collectAsState()
@@ -46,7 +48,8 @@ fun GraphPage(
     val modelHandlers = remember {
         mapOf(
             ModelType.APPROXIMATION to approximationViewModel,
-            ModelType.MAFILTRATION to maFiltrationViewModel
+            ModelType.MAFILTRATION to maFiltrationViewModel,
+            ModelType.ARPREDICTION to arPredictionViewModel
         )
     }
 
@@ -91,6 +94,7 @@ fun GraphPage(
             selectedModel = selectedModel,
             approximationViewModel = approximationViewModel,
             maFiltrationViewModel = maFiltrationViewModel,
+            arPredictionViewModel = arPredictionViewModel,
             navController = navController
         )
 
@@ -117,7 +121,8 @@ fun GraphPage(
                 val modelState = getModelState(
                     selectedModel,
                     approximationViewModel,
-                    maFiltrationViewModel
+                    maFiltrationViewModel,
+                    arPredictionViewModel
                 )
 
                 if (selectedModel != ModelType.NONE && modelState.isLoading) {
@@ -154,7 +159,8 @@ fun GraphPage(
 private fun getModelState(
     modelType: ModelType,
     approximationViewModel: ApproximationModelHandler,
-    maFiltrationViewModel: MaFiltrationModelHandler
+    maFiltrationViewModel: MaFiltrationModelHandler,
+    arPredictionViewModel: ArPredictionModelHandler
 ): ModelUIState {
     return when (modelType) {
         ModelType.APPROXIMATION -> {
@@ -173,6 +179,18 @@ private fun getModelState(
             val data by maFiltrationViewModel.maFiltrationData.collectAsState()
             val isLoading by maFiltrationViewModel.isLoading.collectAsState()
             val error by maFiltrationViewModel.error.collectAsState()
+            ModelUIState(
+                data = data,
+                isLoading = isLoading,
+                error = error,
+                columnName = modelType.getColumnName(),
+                displayName = modelType.displayName
+            )
+        }
+        ModelType.ARPREDICTION -> {
+            val data by arPredictionViewModel.arPredictionData.collectAsState()
+            val isLoading by arPredictionViewModel.isLoading.collectAsState()
+            val error by arPredictionViewModel.error.collectAsState()
             ModelUIState(
                 data = data,
                 isLoading = isLoading,

@@ -1,4 +1,4 @@
-package com.example.datamanager.mid.main_pages
+package com.example.datamanager.mid.main_pages.model_handlers
 
 import android.util.Log
 import com.example.datamanager.backend.api_manager.StockEntry

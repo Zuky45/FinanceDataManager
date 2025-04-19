@@ -32,7 +32,9 @@ enum class ModelType(val displayName: String) {
     APPROXIMATION("Approximation"),
 
     /** Represents a moving average filtration model. */
-    MAFILTRATION("Moving Average");
+    MAFILTRATION("Moving Average"),
+
+    ARPREDICTION("AR Prediction");
 
     /**
      * Retrieves the column name associated with the model type.
@@ -43,5 +45,6 @@ enum class ModelType(val displayName: String) {
         NONE -> ""
         APPROXIMATION -> "Approximation"
         MAFILTRATION -> "MaFiltration"
+        ARPREDICTION -> "Prediction"
     }
 }

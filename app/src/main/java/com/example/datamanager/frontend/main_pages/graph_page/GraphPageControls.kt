@@ -8,8 +8,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.datamanager.mid.main_pages.ApproximationModelHandler
-import com.example.datamanager.mid.main_pages.MaFiltrationModelHandler
+import com.example.datamanager.mid.main_pages.model_handlers.ApproximationModelHandler
+import com.example.datamanager.mid.main_pages.model_handlers.ArPredictionModelHandler
+import com.example.datamanager.mid.main_pages.model_handlers.MaFiltrationModelHandler
 
 /**
  * Composable function to display controls for the selected model.
@@ -24,6 +25,7 @@ fun ModelControls(
     selectedModel: ModelType,
     approximationViewModel: ApproximationModelHandler,
     maFiltrationViewModel: MaFiltrationModelHandler,
+    arPredictionViewModel: ArPredictionModelHandler,
     navController: NavController
 ) {
     Row(
@@ -46,7 +48,10 @@ fun ModelControls(
                 ApproximationControls(approximationViewModel, navController)
             }
             ModelType.MAFILTRATION -> {
-                MaFiltrationControls(maFiltrationViewModel)
+                MaFiltrationControls(maFiltrationViewModel, navController)
+            }
+            ModelType.ARPREDICTION -> {
+                ArPredictionControls(arPredictionViewModel, navController)
             }
             else -> {}
         }
@@ -127,11 +132,18 @@ fun ApproximationControls(
  * @param viewModel The ViewModel for handling moving average filtration logic.
  */
 @Composable
-fun MaFiltrationControls(viewModel: MaFiltrationModelHandler) {
+fun MaFiltrationControls(
+    viewModel: MaFiltrationModelHandler,
+    navController: NavController
+) {
     val windowSizeOptions = listOf(2, 3, 5, 7, 10, 14, 21) // Available window size options for the model
     var expandedWindowSize by remember { mutableStateOf(false) } // State to track dropdown menu visibility
     val selectedWindowSize by viewModel.windowSize.collectAsState() // Currently selected window size
-
+    val filtrationData by viewModel.maFiltrationData.collectAsState() // Current filtration data
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
     Box {
         // Button to display the dropdown menu for selecting a window size
         OutlinedButton(
@@ -161,6 +173,120 @@ fun MaFiltrationControls(viewModel: MaFiltrationModelHandler) {
                 )
 
             }
+        }
+
+    }
+        Button(
+            onClick = {
+                navController.navigate("filtration_details")
+            },
+            enabled = filtrationData != null,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = DarkThemeColors.secondary,
+                disabledContainerColor = DarkThemeColors.secondary.copy(alpha = 0.5f)
+            )
+        ) {
+            Text("Details")
+        }
+    }
+}
+
+@Composable
+fun ArPredictionControls(
+    viewModel: ArPredictionModelHandler,
+    navController: NavController
+) {
+    val orderOptions = (1..30).toList()
+    val horizonOptions = listOf(5, 10, 15, 20, 30)
+    var expandedOrder by remember { mutableStateOf(false) }
+    var expandedHorizon by remember { mutableStateOf(false) }
+    val selectedOrder by viewModel.order.collectAsState()
+    val selectedHorizon by viewModel.predictionHorizon.collectAsState()
+    val predictionData by viewModel.arPredictionData.collectAsState()
+    val coefficients by viewModel.coefficients.collectAsState()
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        // Order dropdown
+        Box {
+            OutlinedButton(
+                onClick = { expandedOrder = true },
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = DarkThemeColors.onBackground
+                ),
+                border = ButtonDefaults.outlinedButtonBorder.copy(
+                    brush = SolidColor(DarkThemeColors.onBackground)
+                )
+            ) {
+                Text("Order: $selectedOrder")
+            }
+
+            DropdownMenu(
+                expanded = expandedOrder,
+                onDismissRequest = { expandedOrder = false }
+            ) {
+                orderOptions.forEach { order ->
+                    DropdownMenuItem(
+                        text = { Text("$order") },
+                        onClick = {
+                            viewModel.setOrder(order)
+                            expandedOrder = false
+                        }
+                    )
+                }
+            }
+        }
+
+        // Horizon dropdown
+        Box {
+            OutlinedButton(
+                onClick = { expandedHorizon = true },
+                colors = ButtonDefaults.outlinedButtonColors(
+                    contentColor = DarkThemeColors.onBackground
+                ),
+                border = ButtonDefaults.outlinedButtonBorder.copy(
+                    brush = SolidColor(DarkThemeColors.onBackground)
+                )
+            ) {
+                Text("Horizon: $selectedHorizon")
+            }
+
+            DropdownMenu(
+                expanded = expandedHorizon,
+                onDismissRequest = { expandedHorizon = false }
+            ) {
+                horizonOptions.forEach { horizon ->
+                    DropdownMenuItem(
+                        text = { Text("$horizon") },
+                        onClick = {
+                            viewModel.setPredictionHorizon(horizon)
+                            expandedHorizon = false
+                        }
+                    )
+                }
+            }
+        }
+
+
+    }
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        // Details button
+        Button(
+            onClick = {
+                navController.navigate("ar_prediction_details")
+            },
+            enabled = predictionData != null && coefficients != null,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = DarkThemeColors.secondary,
+                disabledContainerColor = DarkThemeColors.secondary.copy(alpha = 0.5f)
+            )
+        ) {
+            Text("Details")
         }
     }
 }

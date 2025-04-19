@@ -1,4 +1,4 @@
-package com.example.datamanager.frontend.main_pages
+package com.example.datamanager.frontend.main_pages.model_details
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -7,7 +7,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -17,29 +16,33 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
 import com.example.datamanager.frontend.main_pages.graph_page.DarkThemeColors
 import com.example.datamanager.frontend.main_pages.graph_page.NoDataView
-import com.example.datamanager.mid.main_pages.ApproximationModelHandler
+import com.example.datamanager.mid.main_pages.model_handlers.ArPredictionModelHandler
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import org.jetbrains.kotlinx.dataframe.DataFrame
+import java.text.DecimalFormat
 import android.graphics.Color as AndroidColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ApproximationDetailsPage(
+fun ArPredictionDetailsPage(
     navController: NavController,
-    approximationHandler: ApproximationModelHandler
+    arPredictionHandler: ArPredictionModelHandler
 ) {
     // Collect states within the composable scope
-    val dataFrame by approximationHandler.approximationData.collectAsState(initial = null)
-    val degree by approximationHandler.degree.collectAsState(initial = 0)
-    val coefficients by approximationHandler.coefficients.collectAsState(initial = null)
+    val stockData by arPredictionHandler.stockData.collectAsState()
+    val predictionData by arPredictionHandler.arPredictionData.collectAsState()
+    val coefficients by arPredictionHandler.coefficients.collectAsState()
+    val order by arPredictionHandler.order.collectAsState()
+    val horizon by arPredictionHandler.predictionHorizon.collectAsState()
+    val formatter = remember { DecimalFormat("#,##0.00000") }
 
     Scaffold(
         topBar = {
             SmallTopAppBar(
-                title = { Text("Polynomial Approximation") },
+                title = { Text("AR Prediction Model") },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
@@ -59,65 +62,73 @@ fun ApproximationDetailsPage(
                 .background(DarkThemeColors.background)
                 .padding(16.dp)
         ) {
-            if (dataFrame == null || coefficients == null) {
+            if (predictionData == null || coefficients == null) {
                 NoDataView()
             } else {
-                ApproximationContent(
-                    degree = degree,
+                ArPredictionContent(
+                    order = order,
+                    horizon = horizon,
                     coefficients = coefficients!!,
-                    dataFrame = dataFrame!!
+                    stockData = stockData,
+                    predictionData = predictionData!!,
+                    formatter = formatter
                 )
             }
         }
     }
 }
 
-
 @Composable
-private fun ApproximationContent(
-    degree: Int,
+private fun ArPredictionContent(
+    order: Int,
+    horizon: Int,
     coefficients: DoubleArray,
-    dataFrame: DataFrame<*>
+    stockData: DataFrame<*>?,
+    predictionData: DataFrame<*>,
+    formatter: DecimalFormat
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        // Polynomial model card
+        // AR model info card
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = DarkThemeColors.surface)
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = "Polynomial Degree: $degree",
+                    text = "AR($order) Model",
+                    style = MaterialTheme.typography.titleLarge,
+                    color = DarkThemeColors.onSurface
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = "Prediction Horizon: $horizon points",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = DarkThemeColors.onSurface
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = "Model Coefficients:",
                     style = MaterialTheme.typography.titleMedium,
                     color = DarkThemeColors.onSurface
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
 
+                // Display intercept
                 Text(
-                    text = "Model Equation:",
-                    style = MaterialTheme.typography.bodyMedium,
+                    text = "Intercept: ${formatter.format(coefficients[0])}",
+                    style = MaterialTheme.typography.bodySmall,
                     color = DarkThemeColors.onSurface
                 )
 
-                Text(
-                    text = formatPolynomialEquation(coefficients),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = DarkThemeColors.onSurface
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = "Coefficients:",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = DarkThemeColors.onSurface
-                )
-
-                coefficients.forEachIndexed { index, value ->
+                // Display AR coefficients
+                for (i in 1 until coefficients.size) {
                     Text(
-                        text = "a$index = ${String.format("%.6f", value)}",
+                        text = "AR($i): ${formatter.format(coefficients[i])}",
                         style = MaterialTheme.typography.bodySmall,
                         color = DarkThemeColors.onSurface
                     )
@@ -150,7 +161,7 @@ private fun ApproximationContent(
                     }
                 },
                 update = { chart ->
-                    updateApproximationChart(chart, dataFrame)
+                    updateArPredictionChart(chart, predictionData)
                 }
             )
         }
@@ -179,7 +190,7 @@ private fun ApproximationContent(
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Approximation",
+                        text = "Prediction",
                         modifier = Modifier.weight(1f),
                         textAlign = TextAlign.Center,
                         color = DarkThemeColors.onSurface,
@@ -189,20 +200,20 @@ private fun ApproximationContent(
 
                 // Table data
                 LazyColumn {
-                    items(dataFrame.rowsCount()) { index ->
+                    items(predictionData.rowsCount()) { index ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(vertical = 4.dp, horizontal = 8.dp)
                         ) {
                             Text(
-                                text = dataFrame["Time"][index]?.toString() ?: "-",
+                                text = predictionData["Time"][index]?.toString() ?: "-",
                                 modifier = Modifier.weight(1f),
                                 textAlign = TextAlign.Center,
                                 color = DarkThemeColors.onSurface
                             )
                             Text(
-                                text = dataFrame["Approximation"][index]?.toString() ?: "-",
+                                text = predictionData["Prediction"][index]?.toString() ?: "-",
                                 modifier = Modifier.weight(1f),
                                 textAlign = TextAlign.Center,
                                 color = DarkThemeColors.onSurface
@@ -216,19 +227,19 @@ private fun ApproximationContent(
 }
 
 /**
- * Updates the chart with approximation data only
+ * Updates the chart with AR prediction data
  */
-private fun updateApproximationChart(chart: LineChart, dataFrame: DataFrame<*>) {
+private fun updateArPredictionChart(chart: LineChart, dataFrame: DataFrame<*>) {
     val entries = ArrayList<Entry>()
 
     for (i in 0 until dataFrame.rowsCount()) {
         val x = dataFrame["Time"][i]?.toString()?.toFloatOrNull() ?: i.toFloat()
-        val y = dataFrame["Approximation"][i]?.toString()?.toFloatOrNull() ?: 0f
+        val y = dataFrame["Prediction"][i]?.toString()?.toFloatOrNull() ?: 0f
         entries.add(Entry(x, y))
     }
 
-    val dataSet = LineDataSet(entries, "Approximation").apply {
-        color = AndroidColor.rgb(255, 165, 0)
+    val dataSet = LineDataSet(entries, "AR Prediction").apply {
+        color = AndroidColor.rgb(0, 191, 255) // Deep sky blue
         lineWidth = 2.5f
         setDrawCircles(false)
         mode = LineDataSet.Mode.CUBIC_BEZIER
@@ -237,19 +248,4 @@ private fun updateApproximationChart(chart: LineChart, dataFrame: DataFrame<*>) 
 
     chart.data = LineData(dataSet)
     chart.invalidate()
-}
-
-/**
- * Formats polynomial equation from coefficients
- */
-private fun formatPolynomialEquation(coefficients: DoubleArray): String {
-    val terms = coefficients.mapIndexed { index, coef ->
-        val formattedCoef = String.format("%.4f", coef)
-        when (index) {
-            0 -> formattedCoef
-            1 -> "${formattedCoef}x"
-            else -> "${formattedCoef}x^$index"
-        }
-    }
-    return terms.reversed().joinToString(" + ")
 }
