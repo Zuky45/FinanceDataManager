@@ -112,22 +112,22 @@ class ArPrediction(
      * @return An array of regression coefficients, including the intercept.
      */
     private fun fitArModel(data: List<Double>, order: Int): DoubleArray {
-        val regression = OLSMultipleLinearRegression()
+        val regression = OLSMultipleLinearRegression() // Create an OLS regression instance
 
         // Prepare data for regression
-        val n = data.size - order
-        val y = DoubleArray(n)
-        val x = Array(n) { DoubleArray(order) }
+        val n = data.size - order // Number of observations
+        val y = DoubleArray(n) // Dependent variable (response)
+        val x = Array(n) { DoubleArray(order) } // Independent variables (predictors)
 
-        for (i in 0 until n) {
-            y[i] = data[i + order]
-            for (j in 0 until order) {
-                x[i][j] = data[i + order - j - 1]
+        for (i in 0 until n) { // Fill the response and predictor arrays
+            y[i] = data[i + order] // Current value
+            for (j in 0 until order) { // Previous values
+                x[i][j] = data[i + order - j - 1] // Previous value
             }
         }
 
-        regression.newSampleData(y, x)
-        return regression.estimateRegressionParameters()
+        regression.newSampleData(y, x) // Set the sample data for regression
+        return regression.estimateRegressionParameters() // Estimate the regression parameters (coefficients)
     }
 
     /**
@@ -143,19 +143,19 @@ class ArPrediction(
         coefficients: DoubleArray,
         horizon: Int
     ): List<Double> {
-        val result = mutableListOf<Double>()
-        val workingData = data.toMutableList()
+        val result = mutableListOf<Double>() // List to hold predicted values
+        val workingData = data.toMutableList() // Copy of historical data for prediction
 
         // Generate predictions one step at a time
         for (i in 0 until horizon) {
-            var prediction = coefficients[0] // Intercept
+            var prediction = coefficients[0] // Intercept, the first coefficient
 
             // Apply AR coefficients to previous values
             for (j in 1 until coefficients.size) {
-                prediction += coefficients[j] * workingData[workingData.size - j]
+                prediction += coefficients[j] * workingData[workingData.size - j] // Previous value
             }
 
-            result.add(prediction)
+            result.add(prediction) // Add prediction to result list
             workingData.add(prediction) // Add prediction to working data for next step
         }
 

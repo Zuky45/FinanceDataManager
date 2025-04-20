@@ -2,7 +2,7 @@ package com.example.datamanager.mid.login_pages
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.datamanager.backend.db_manager.DBManager
+import com.example.datamanager.backend.db_manager.auth.DBManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
