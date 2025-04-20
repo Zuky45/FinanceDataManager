@@ -7,6 +7,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.datamanager.backend.api_manager.ApiManager
 import com.example.datamanager.backend.api_manager.StockEntry
+import com.example.datamanager.backend.db_manager.db.StockDBManager
 import com.example.datamanager.backend.db_manager.db.StockDatabase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -56,15 +57,11 @@ class MainPageModelHandler(application: Application) : AndroidViewModel(applicat
     // List of available stock symbols
     private val symbols = ApiManager().getAvailableActions()
 
-    // Map to store the last known prices of stocks
-    private var lastPrices = mutableMapOf<String, Double>()
 
     // Instance of ApiManager to fetch stock data
     private val apiManager = ApiManager()
 
-    private val database = StockDatabase.getDatabase(application)
-    private val dao = database.historicalStockActionDao()
-    private val _historicList = mutableListOf<Double>()
+    private val dbManager = StockDBManager(application);
 
     /**
      * Initializes the ViewModel by loading stock actions when the ViewModel is created.
@@ -97,16 +94,7 @@ class MainPageModelHandler(application: Application) : AndroidViewModel(applicat
                     // Get the most recent stock entry
                     val latestEntry = data["Price"].last()
                     val price = latestEntry as Double
-
-                    val previousPrice = lastPrices[symbol] ?: 0.0
-
-                    // Calculate the percentage change in price
-                    val change = if (previousPrice > 0) {
-                        ((price - previousPrice) / previousPrice) * 100
-                    } else 0.0
-
-                    // Update the last known price for the symbol
-                    lastPrices[symbol] = price
+                    val change = dbManager.calculatePriceChange(symbol)
 
                     // Add the stock action to the list
                     stockActions.add(
