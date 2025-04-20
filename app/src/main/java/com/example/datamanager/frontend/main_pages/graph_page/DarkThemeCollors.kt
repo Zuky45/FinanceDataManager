@@ -22,6 +22,9 @@ object DarkThemeColors {
     /** Secondary color used for accents and less prominent UI elements. */
     val secondary = Color(0xFF03DAC6)
 
+    /** Orange color used for accents and less prominent UI elements. */
+    val orange = Color(0xFFFF9800)
+
     /** Color used for text and icons displayed on the background. */
     val onBackground = Color.White
 

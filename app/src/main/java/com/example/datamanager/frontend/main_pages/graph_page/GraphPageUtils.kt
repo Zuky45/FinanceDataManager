@@ -98,12 +98,12 @@ fun updateChartData(
                 }
 
                 val modelDataSet = LineDataSet(modelEntries, modelName).apply {
-                    color = AndroidColor.rgb(255, 89, 94) // Set line color
+                    color = AndroidColor.rgb(255, 165, 0) // Set line color
                     valueTextColor = AndroidColor.WHITE // Set text color
                     lineWidth = 2f // Set line width
                     setDrawCircles(false) // Disable circles on data points
                     setDrawValues(false) // Disable value labels
-                    mode = LineDataSet.Mode.CUBIC_BEZIER // Use cubic bezier for smooth lines
+                    mode = LineDataSet.Mode.HORIZONTAL_BEZIER // Use cubic bezier for smooth lines
                 }
                 dataSets.add(modelDataSet)
             }

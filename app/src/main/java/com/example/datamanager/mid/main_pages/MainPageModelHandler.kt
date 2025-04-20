@@ -1,10 +1,13 @@
 package com.example.datamanager.mid.main_pages
 
+import android.app.Application
 import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.datamanager.backend.api_manager.ApiManager
 import com.example.datamanager.backend.api_manager.StockEntry
+import com.example.datamanager.backend.db_manager.db.StockDatabase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,7 +35,7 @@ data class StockAction(
  * ViewModel class responsible for managing the state and logic of the main page.
  * It fetches stock data, calculates price changes, and updates the UI state.
  */
-class MainPageModelHandler : ViewModel() {
+class MainPageModelHandler(application: Application) : AndroidViewModel(application) {
 
     // StateFlow to indicate whether data is being loaded
     private val _isLoading = MutableStateFlow(false)
@@ -58,6 +61,10 @@ class MainPageModelHandler : ViewModel() {
 
     // Instance of ApiManager to fetch stock data
     private val apiManager = ApiManager()
+
+    private val database = StockDatabase.getDatabase(application)
+    private val dao = database.historicalStockActionDao()
+    private val _historicList = mutableListOf<Double>()
 
     /**
      * Initializes the ViewModel by loading stock actions when the ViewModel is created.
@@ -122,6 +129,7 @@ class MainPageModelHandler : ViewModel() {
         _isLoading.value = false
     }
 
+
     /**
      * Refreshes the stock prices by reloading the stock actions.
      */
@@ -130,4 +138,5 @@ class MainPageModelHandler : ViewModel() {
             loadActions()
         }
     }
+
 }
