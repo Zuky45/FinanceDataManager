@@ -53,7 +53,6 @@ class StockDBManager(private val context: Context) {
      * Fetches and stores the current stock data in the database
      */
     private suspend fun storeCurrentData() {
-        dao.clearAll()
         Log.d("StockDBManager", "Storing current stock data")
         val timestamp = System.currentTimeMillis()
         val stockActions = mutableListOf<HistoricalStockAction>()
