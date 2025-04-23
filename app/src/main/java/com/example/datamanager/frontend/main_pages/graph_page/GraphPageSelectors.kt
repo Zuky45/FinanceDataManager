@@ -76,7 +76,7 @@ fun ModelSelector(
             .horizontalScroll(rememberScrollState()), // Enables horizontal scrolling for the row
         horizontalArrangement = Arrangement.spacedBy(8.dp) // Adds spacing between buttons
     ) {
-        ModelType.values().forEach { modelType ->
+        ModelType.entries.forEach { modelType ->
             // Button for each model type
             OutlinedButton(
                 onClick = { onModelSelected(modelType) }, // Notify the parent of the selected model type

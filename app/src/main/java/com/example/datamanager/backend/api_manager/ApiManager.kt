@@ -8,6 +8,7 @@ import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.jetbrains.kotlinx.dataframe.DataFrame
+import org.jetbrains.kotlinx.dataframe.api.lastOrNull
 import org.jetbrains.kotlinx.dataframe.api.rename
 import org.jetbrains.kotlinx.dataframe.api.toDataFrame
 
@@ -146,6 +147,23 @@ class ApiManager {
         return stockEntries.mapIndexed { index, entry -> entry.copy(timestamp = (index + 1).toLong()) }
             .toDataFrame()
             .rename("timestamp" to "Time", "close" to "Price")
+    }
+
+    suspend fun getCurrentPrices(): Map<String, Double> {
+        val actions = getAvailableActions()
+        val prices = mutableMapOf<String, Double>()
+
+        for (action in actions) {
+            val dataFrame = fetchData(action)
+            if (dataFrame != null && dataFrame.rowsCount() > 0) {
+                val latestPrice = dataFrame["Price"].lastOrNull() as? Double
+                if (latestPrice != null) {
+                    prices[action] = latestPrice
+                }
+            }
+        }
+
+        return prices
     }
 
 }

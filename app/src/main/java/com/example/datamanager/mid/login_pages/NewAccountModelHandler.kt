@@ -13,7 +13,7 @@ import kotlinx.coroutines.launch
  * @property dbManager The database manager used for account creation operations.
  */
 class NewAccountModelHandler(
-    private val dbManager: DBManager = DBManager()
+    private val dbManager: DBManager = DBManager.getInstance()
 ) : ViewModel() {
 
     // StateFlow to hold the email input value

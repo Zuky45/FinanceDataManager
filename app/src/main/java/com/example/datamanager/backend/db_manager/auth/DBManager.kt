@@ -8,7 +8,7 @@ import kotlinx.coroutines.withContext
 /**
  * This class manages the database operations for user authentication and session management.
  */
-class DBManager {
+class DBManager private constructor(){
     private val auth = FirebaseAuth.getInstance()
 
     /**
@@ -57,4 +57,16 @@ class DBManager {
      * Logs out the currently logged-in user.
      */
     fun signOut() = auth.signOut()
+
+    companion object {
+        @Volatile
+        private var instance: DBManager? = null
+
+        fun getInstance(): DBManager {
+            return instance ?: synchronized(this) {
+                instance ?: DBManager().also { instance = it }
+            }
+        }
+    }
+
 }

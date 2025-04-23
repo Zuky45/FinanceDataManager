@@ -82,7 +82,7 @@ fun updateChartData(
                 val modelEntries = ArrayList<Entry>()
 
                 // Special handling for AR prediction - start from index 100
-                val startIndex = if (modelName == "AR Prediction") 100 else 0
+                val startIndex = if (modelName == "AR Prediction") dataFrame.rowsCount() else 0
 
                 for (i in 0 until modelDataFrame.rowsCount()) {
                     val value = modelDataFrame[modelColumnName][i].toString().toFloatOrNull() ?: 0f

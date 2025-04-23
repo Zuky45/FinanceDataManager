@@ -86,6 +86,21 @@ fun MainPage(navController: NavController) {
                         },
                         modifier = Modifier.padding(horizontal = 12.dp)
                     )
+
+                    // Navigation drawer item for alerts
+                    NavigationDrawerItem(
+                        icon = { Icon(Icons.Default.Notifications, null) },
+                        label = { Text("Alerts") },
+                        selected = selectedOption == "Alerts",
+                        onClick = {
+                            selectedOption = "Alerts"
+                            scope.launch {
+                                drawerState.close()
+                                navController.navigate("alerts")
+                            }
+                        },
+                        modifier = Modifier.padding(horizontal = 12.dp)
+                    )
                 }
             }
         ) {
@@ -369,7 +384,6 @@ fun StockGraph(
         modifier = modifier
     )
 }
-
 
 
 

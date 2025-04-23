@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
  * ViewModel class responsible for handling the login logic and managing the state of the login screen.
  */
 class LoginModelHandler : ViewModel() {
-    private val manager = DBManager()
+    private val manager = DBManager.getInstance()
 
     // StateFlow to hold the email input value
     private val _email = MutableStateFlow("")
