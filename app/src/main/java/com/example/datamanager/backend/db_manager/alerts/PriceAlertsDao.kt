@@ -5,8 +5,8 @@ import androidx.room.*
 @Entity(tableName = "price_alerts")
 data class PriceAlert(
     @PrimaryKey
-    val userId: String,
     val symbol: String,
+    val userId: String,
     val price: Double,
     val isEnabled: Boolean = true,
     val createdAt: Long = System.currentTimeMillis()
@@ -29,7 +29,7 @@ interface PriceAlertDao {
     @Query("SELECT * FROM price_alerts WHERE userId = :userId AND isEnabled = 1")
     suspend fun getEnabledAlertsForUser(userId: String): List<PriceAlert>
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertAlert(alert: PriceAlert)
 
     @Delete
@@ -40,5 +40,6 @@ interface PriceAlertDao {
 
     @Query("DELETE FROM price_alerts WHERE userId = :userId AND symbol = :symbol")
     suspend fun deleteAlertForUser(userId: String, symbol: String)
+
 
 }

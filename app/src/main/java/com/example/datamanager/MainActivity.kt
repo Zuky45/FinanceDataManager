@@ -9,6 +9,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.datamanager.frontend.login_pages.LoginScreen
 import com.example.datamanager.frontend.login_pages.NewAccountPage
+import com.example.datamanager.frontend.main_pages.AlertsPage
 import com.example.datamanager.frontend.main_pages.model_details.ApproximationDetailsPage
 import com.example.datamanager.frontend.main_pages.model_details.ArPredictionDetailsPage
 import com.example.datamanager.frontend.main_pages.GraphPage
@@ -52,6 +53,7 @@ class MainActivity : ComponentActivity() {
                     navController = navController
                 )
             }
+            composable("alerts") { AlertsPage(navController) }
         }
     }
 }

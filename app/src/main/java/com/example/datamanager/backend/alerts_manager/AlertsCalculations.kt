@@ -15,7 +15,7 @@ class AlertsCalculations {
                 val price = alert.price
 
                 if (currentPrice != null) {
-                    if (price >= currentPrice) {
+                    if (currentPrice >= price) {
                         triggeredAlerts.add(symbol)
                     }
 

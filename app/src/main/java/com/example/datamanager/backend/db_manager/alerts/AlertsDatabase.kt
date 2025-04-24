@@ -19,7 +19,7 @@ abstract class AlertsDatabase : RoomDatabase() {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
                     AlertsDatabase::class.java,
-                    "alerts_database"
+                    "new_alerts_database"
                 ).build()
                 INSTANCE = instance
                 instance
