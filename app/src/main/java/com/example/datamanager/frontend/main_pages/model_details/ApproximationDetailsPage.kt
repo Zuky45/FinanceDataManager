@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.RoundRect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -29,6 +30,8 @@ import com.github.mikephil.charting.data.Entry
 import com.github.mikephil.charting.data.LineData
 import com.github.mikephil.charting.data.LineDataSet
 import org.jetbrains.kotlinx.dataframe.DataFrame
+import java.text.DecimalFormat
+import java.util.Locale
 import android.graphics.Color as AndroidColor
 
 /**
@@ -47,6 +50,7 @@ fun ApproximationDetailsPage(
     val dataFrame by approximationHandler.approximationData.collectAsState(initial = null)
     val degree by approximationHandler.degree.collectAsState(initial = 0)
     val coefficients by approximationHandler.coefficients.collectAsState(initial = null)
+    val mse by approximationHandler.mse.collectAsState(initial = 0.0)
 
     Scaffold(
         topBar = {
@@ -83,7 +87,8 @@ fun ApproximationDetailsPage(
                 ApproximationContent(
                     degree = degree,
                     coefficients = coefficients!!,
-                    dataFrame = dataFrame!!
+                    dataFrame = dataFrame!!,
+                    mseValue = mse,
                 )
             }
         }
@@ -101,10 +106,11 @@ fun ApproximationDetailsPage(
 private fun ApproximationContent(
     degree: Int,
     coefficients: DoubleArray,
-    dataFrame: DataFrame<*>
+    dataFrame: DataFrame<*>,
+    mseValue : Double
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        // Polynomial model card displaying degree, equation, and coefficients
+        // Polynomial model card displaying degree, equation, and coefficients, mean squared error
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(containerColor = DarkThemeColors.surface)
@@ -113,9 +119,17 @@ private fun ApproximationContent(
                 Text(
                     text = stringResource(R.string.polynomial_degree_format, degree),
                     style = MaterialTheme.typography.titleMedium,
-                    color = DarkThemeColors.onSurface
+                    color = DarkThemeColors.onSurface,
+
                 )
 
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = stringResource(R.string.mse_label, toNDecimalPlaces(mseValue,5)),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = DarkThemeColors.onSurface,
+                    fontWeight = FontWeight.Bold
+                )
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
@@ -141,7 +155,7 @@ private fun ApproximationContent(
 
                 coefficients.forEachIndexed { index, value ->
                     Text(
-                        text = stringResource(R.string.coefficient_format, index, String.format("%.6f", value)),
+                        text = stringResource(R.string.coefficient_format, index, toNDecimalPlaces(value,5)),
                         style = MaterialTheme.typography.bodySmall,
                         color = DarkThemeColors.onSurface
                     )
@@ -275,7 +289,7 @@ private fun updateApproximationChart(chart: LineChart, dataFrame: DataFrame<*>) 
  */
 private fun formatPolynomialEquation(coefficients: DoubleArray): String {
     val terms = coefficients.mapIndexed { index, coef ->
-        val formattedCoef = String.format("%.4f", coef)
+        val formattedCoef = toNDecimalPlaces(coef,10)
         when (index) {
             0 -> formattedCoef
             1 -> "${formattedCoef}x"
@@ -283,4 +297,8 @@ private fun formatPolynomialEquation(coefficients: DoubleArray): String {
         }
     }
     return terms.reversed().joinToString(" + ")
+}
+
+private fun toNDecimalPlaces(value: Double, places : Int): Double {
+    return String.format(Locale.US, "%.${places}f", value).toDouble()
 }

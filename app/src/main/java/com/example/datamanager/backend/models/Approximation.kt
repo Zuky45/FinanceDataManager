@@ -78,4 +78,21 @@ class Approximation(dataFrame: DataFrame<*>? = null, private var degree: Int = 1
     fun getCoefficients(): DoubleArray? {
         return _coefficients
     }
+
+    fun calculateMSE(): Double {
+        val dataFrame = getDataFrame()
+        if (dataFrame != null && _approximationModel != null) {
+            val originalValues = dataFrame["Price"].toList().mapNotNull { it as? Double }
+            val approxValues = _approximationModel!!["Approximation"].toList().mapNotNull { it as? Double }
+
+            var mse = 0.0
+            for (i in originalValues.indices) {
+                val error = originalValues[i] - approxValues[i]
+                mse += error * error
+            }
+
+            return mse / originalValues.size
+        }
+        return 0.0
+    }
 }

@@ -29,6 +29,9 @@ class ApproximationModelHandler : ModelHandler() {
     private var _degree = MutableStateFlow<Int>(1)
     val degree: StateFlow<Int> = _degree.asStateFlow()
 
+    private var _mse = MutableStateFlow<Double>(0.0)
+    val mse: StateFlow<Double> = _mse.asStateFlow()
+
     /**
      * Sets the polynomial degree for the approximation.
      *
@@ -59,7 +62,6 @@ class ApproximationModelHandler : ModelHandler() {
             }
         }
     }
-
     /**
      * Calculates polynomial approximation for the given stock data.
      *
@@ -72,6 +74,7 @@ class ApproximationModelHandler : ModelHandler() {
 
             _approximationData.value = approximation.getModel()
             _coefficients.value = approximation.getCoefficients()
+            _mse.value = approximation.calculateMSE()
 
             if (_approximationData.value == null) {
                 getError().value = "Failed to calculate approximation model"
@@ -81,6 +84,7 @@ class ApproximationModelHandler : ModelHandler() {
             getError().value = "Error calculating approximation: ${e.message}"
         }
     }
+
 
     companion object {
         @Volatile

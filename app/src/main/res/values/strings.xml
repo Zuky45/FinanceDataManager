@@ -71,7 +71,7 @@
         <string name="change_column">Change</string>
 
         <!-- Graph Page -->
-        <string name="select_stock">Select Stock: %1$s</string>
+        <string name="select_stock">Select Stock:</string>
         <string name="calculating_model">Calculating %1$s model…</string>
         <string name="graph_page_log_tag">GraphPage</string>
         <string name="error_adding_model_data">Error adding model data</string>
@@ -95,6 +95,7 @@
         <string name="window_size_label">Window Size: %1$d</string>
         <string name="order_label">Order: %1$d</string>
         <string name="horizon_label">Horizon: %1$d</string>
+        <string name ="mse_label">MSE: %1$.2f</string>
 
         <!-- Polynomial Approximation -->
         <string name="polynomial_approximation_title">Polynomial Approximation</string>
