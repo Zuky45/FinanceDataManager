@@ -1,6 +1,8 @@
 package com.example.datamanager.frontend.main_pages.graph_page
 
+import com.example.datamanager.R
 import org.jetbrains.kotlinx.dataframe.DataFrame
+import javax.mail.Quota.Resource
 
 /**
  * Data class representing the UI state for a model.

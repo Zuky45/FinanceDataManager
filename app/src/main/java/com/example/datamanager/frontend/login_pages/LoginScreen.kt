@@ -16,10 +16,15 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.datamanager.R
+import com.example.datamanager.frontend.navigations.NavigationRoutes
 import com.example.datamanager.mid.login_pages.LoginModelHandler
 
 /**
  * Composable function that represents the login screen.
+ *
+ * This screen provides input fields for the user to enter their email and password,
+ * a login button to authenticate, and a button to navigate to the account creation screen.
+ * It also handles validation, error states, and navigation upon successful login.
  *
  * @param navController The navigation controller used to navigate between screens.
  * @param modifier The modifier to be applied to the root composable.
@@ -39,7 +44,7 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
     // Navigate to the main screen on successful login
     LaunchedEffect(loginSuccess) {
         if (loginSuccess) {
-            navController.navigate("main")
+            navController.navigate(NavigationRoutes.MAIN)
             modelHandler.resetState()
         }
     }
@@ -141,7 +146,7 @@ fun LoginScreen(navController: NavController, modifier: Modifier = Modifier) {
 
                 // Button to navigate to the account creation screen
                 TextButton(
-                    onClick = { navController.navigate("new_account") },
+                    onClick = { navController.navigate(NavigationRoutes.NEW_ACCOUNT) },
                     modifier = Modifier.padding(top = 16.dp),
                     colors = ButtonDefaults.textButtonColors(
                         contentColor = MaterialTheme.colorScheme.primary

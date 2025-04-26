@@ -5,14 +5,18 @@
  */
 package com.example.datamanager.frontend.main_pages.graph_page
 
+import android.media.MediaRouter2.RoutingController
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.datamanager.R
+import com.example.datamanager.frontend.navigations.NavigationRoutes
 import com.example.datamanager.mid.main_pages.model_handlers.ApproximationModelHandler
 import com.example.datamanager.mid.main_pages.model_handlers.ArPredictionModelHandler
 import com.example.datamanager.mid.main_pages.model_handlers.MaFiltrationModelHandler
@@ -45,7 +49,7 @@ fun ModelControls(
             onClick = { navController.popBackStack() },
             colors = ButtonDefaults.buttonColors(containerColor = DarkThemeColors.primary)
         ) {
-            Text("Back")
+            Text(stringResource(R.string.back))
         }
 
         // Display controls based on the selected model type
@@ -96,7 +100,7 @@ fun ApproximationControls(
                     brush = SolidColor(DarkThemeColors.onBackground)
                 )
             ) {
-                Text("Degree: $selectedDegree")
+                Text(stringResource(R.string.degree_label, selectedDegree))
             }
 
             // Dropdown menu for selecting a degree
@@ -119,7 +123,7 @@ fun ApproximationControls(
         // Details button - only enabled when approximation data is available
         Button(
             onClick = {
-                navController.navigate("approximation_details")
+                navController.navigate(NavigationRoutes.APPROXIMATION_DETAILS)
             },
             enabled = approximationData != null && coefficients != null,
             colors = ButtonDefaults.buttonColors(
@@ -127,7 +131,7 @@ fun ApproximationControls(
                 disabledContainerColor = DarkThemeColors.secondary.copy(alpha = 0.5f)
             )
         ) {
-            Text("Details")
+            Text(stringResource(R.string.details))
         }
     }
 }
@@ -162,7 +166,7 @@ fun MaFiltrationControls(
                     brush = SolidColor(DarkThemeColors.onBackground)
                 )
             ) {
-                Text("Window Size: $selectedWindowSize")
+                Text(stringResource(R.string.window_size_label, selectedWindowSize))
             }
 
             // Dropdown menu for selecting a window size
@@ -185,7 +189,7 @@ fun MaFiltrationControls(
         }
         Button(
             onClick = {
-                navController.navigate("filtration_details")
+                navController.navigate(NavigationRoutes.FILTRATION_DETAILS)
             },
             enabled = filtrationData != null,
             colors = ButtonDefaults.buttonColors(
@@ -193,7 +197,7 @@ fun MaFiltrationControls(
                 disabledContainerColor = DarkThemeColors.secondary.copy(alpha = 0.5f)
             )
         ) {
-            Text("Details")
+            Text(stringResource(R.string.details))
         }
     }
 }
@@ -234,7 +238,7 @@ fun ArPredictionControls(
                     brush = SolidColor(DarkThemeColors.onBackground)
                 )
             ) {
-                Text("Order: $selectedOrder")
+                Text(stringResource(R.string.order_label, selectedOrder))
             }
 
             DropdownMenu(
@@ -264,7 +268,7 @@ fun ArPredictionControls(
                     brush = SolidColor(DarkThemeColors.onBackground)
                 )
             ) {
-                Text("Horizon: $selectedHorizon")
+                Text(stringResource(R.string.horizon_label, selectedHorizon))
             }
 
             DropdownMenu(
@@ -290,7 +294,7 @@ fun ArPredictionControls(
         // Details button - only enabled when prediction data and coefficients are available
         Button(
             onClick = {
-                navController.navigate("ar_prediction_details")
+                navController.navigate(NavigationRoutes.AR_PREDICTION_DETAILS)
             },
             enabled = predictionData != null && coefficients != null,
             colors = ButtonDefaults.buttonColors(
@@ -298,7 +302,7 @@ fun ArPredictionControls(
                 disabledContainerColor = DarkThemeColors.secondary.copy(alpha = 0.5f)
             )
         ) {
-            Text("Details")
+            Text(stringResource(R.string.details))
         }
     }
 }

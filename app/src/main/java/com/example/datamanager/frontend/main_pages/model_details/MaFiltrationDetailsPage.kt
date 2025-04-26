@@ -1,3 +1,8 @@
+/**
+ * This file contains composable functions for the Moving Average (MA) Filtration details page.
+ * It displays detailed information about the MA Filtration model, including window size,
+ * visualization chart, and filtered data table.
+ */
 package com.example.datamanager.frontend.main_pages.model_details
 
 import androidx.compose.foundation.background
@@ -9,11 +14,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
+import com.example.datamanager.R
 import com.example.datamanager.frontend.main_pages.graph_page.DarkThemeColors
 import com.example.datamanager.frontend.main_pages.graph_page.NoDataView
 import com.example.datamanager.mid.main_pages.model_handlers.MaFiltrationModelHandler
@@ -44,10 +51,14 @@ fun MaFiltrationDetailsPage(
         topBar = {
             // Top app bar with a title and back navigation
             SmallTopAppBar(
-                title = { Text("MA Filtration") },
+                title = { Text(stringResource(R.string.ma_filtration_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.back_button),
+                            tint = Color.White
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.smallTopAppBarColors(
@@ -96,7 +107,7 @@ private fun MaFiltrationContent(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = "Window size: $windowSize",
+                    text = stringResource(R.string.window_size_format, windowSize),
                     style = MaterialTheme.typography.titleMedium,
                     color = DarkThemeColors.onSurface
                 )
@@ -152,14 +163,14 @@ private fun MaFiltrationContent(
                         .padding(8.dp)
                 ) {
                     Text(
-                        text = "Time",
+                        text = stringResource(R.string.time_column),
                         modifier = Modifier.weight(1f),
                         textAlign = TextAlign.Center,
                         color = DarkThemeColors.onSurface,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "MA Filtration",
+                        text = stringResource(R.string.ma_filtration_column),
                         modifier = Modifier.weight(1f),
                         textAlign = TextAlign.Center,
                         color = DarkThemeColors.onSurface,
@@ -203,6 +214,7 @@ private fun MaFiltrationContent(
  */
 private fun updateFiltrationChart(chart: LineChart, dataFrame: DataFrame<*>) {
     val entries = ArrayList<Entry>()
+    val context = chart.context
 
     for (i in 0 until dataFrame.rowsCount()) {
         val x = dataFrame["Time"][i]?.toString()?.toFloatOrNull() ?: i.toFloat()
@@ -210,7 +222,7 @@ private fun updateFiltrationChart(chart: LineChart, dataFrame: DataFrame<*>) {
         entries.add(Entry(x, y))
     }
 
-    val dataSet = LineDataSet(entries, "MA Filtration").apply {
+    val dataSet = LineDataSet(entries, context.getString(R.string.ma_filtration_label)).apply {
         color = AndroidColor.rgb(255, 165, 0) // Orange color for the line
         lineWidth = 2.5f // Set line width
         setDrawCircles(false) // Disable circles on data points

@@ -15,6 +15,7 @@ import com.example.datamanager.frontend.main_pages.model_details.ArPredictionDet
 import com.example.datamanager.frontend.main_pages.GraphPage
 import com.example.datamanager.frontend.main_pages.model_details.MaFiltrationDetailsPage
 import com.example.datamanager.frontend.main_pages.MainPage
+import com.example.datamanager.frontend.navigations.NavigationRoutes
 import com.example.datamanager.mid.main_pages.model_handlers.ApproximationModelHandler
 import com.example.datamanager.mid.main_pages.model_handlers.ArPredictionModelHandler
 import com.example.datamanager.mid.main_pages.model_handlers.MaFiltrationModelHandler
@@ -30,30 +31,30 @@ class MainActivity : ComponentActivity() {
     @Composable
     fun MainContent() {
         val navController = rememberNavController()
-        NavHost(navController = navController, startDestination = "login") {
-            composable("main") { MainPage(navController) }
-            composable("login") { LoginScreen(navController) }
-            composable("new_account") { NewAccountPage(navController) }
-            composable("graph") { GraphPage(navController) }
-            composable("approximation_details") {
+        NavHost(navController = navController, startDestination = NavigationRoutes.LOGIN) {
+            composable(NavigationRoutes.MAIN) { MainPage(navController) }
+            composable(NavigationRoutes.LOGIN) { LoginScreen(navController) }
+            composable(NavigationRoutes.NEW_ACCOUNT) { NewAccountPage(navController) }
+            composable(NavigationRoutes.GRAPH) { GraphPage(navController) }
+            composable(NavigationRoutes.APPROXIMATION_DETAILS) {
                 ApproximationDetailsPage(
                     navController = navController,
                     approximationHandler = ApproximationModelHandler.getInstance()
                 )
             }
-            composable("filtration_details") {
+            composable(NavigationRoutes.FILTRATION_DETAILS) {
                 MaFiltrationDetailsPage(
                     navController = navController,
                     maFiltrationModelHandler = MaFiltrationModelHandler.getInstance()
                 )
             }
-            composable("ar_prediction_details") {
+            composable(NavigationRoutes.AR_PREDICTION_DETAILS) {
                 ArPredictionDetailsPage(
                     arPredictionHandler = ArPredictionModelHandler.getInstance(),
                     navController = navController
                 )
             }
-            composable("alerts") { AlertsPage(navController) }
+            composable(NavigationRoutes.ALERTS) { AlertsPage(navController) }
         }
     }
 }

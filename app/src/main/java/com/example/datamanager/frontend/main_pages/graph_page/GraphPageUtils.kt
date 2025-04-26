@@ -1,6 +1,12 @@
+/**
+ * This file contains utility functions for the graph page.
+ * It provides methods for model data reloading, chart data updates, and data frame operations.
+ */
 package com.example.datamanager.frontend.main_pages.graph_page
 
 import android.graphics.Color as AndroidColor
+import androidx.compose.ui.res.stringResource
+import com.example.datamanager.R
 import com.example.datamanager.backend.api_manager.StockEntry
 import com.example.datamanager.mid.main_pages.model_handlers.ApproximationModelHandler
 import com.example.datamanager.mid.main_pages.model_handlers.ArPredictionModelHandler
@@ -53,6 +59,7 @@ fun updateChartData(
     modelColumnName: String
 ) {
     val dataSets = ArrayList<ILineDataSet>()
+    val context = chart.context
 
     // Add stock data to the chart
     val stockEntries = ArrayList<Entry>()
@@ -61,7 +68,7 @@ fun updateChartData(
         stockEntries.add(Entry(i.toFloat(), price))
     }
 
-    val stockDataSet = LineDataSet(stockEntries, "Price").apply {
+    val stockDataSet = LineDataSet(stockEntries, context.getString(R.string.price_label)).apply {
         color = AndroidColor.rgb(66, 134, 244) // Set line color
         valueTextColor = AndroidColor.WHITE // Set text color
         lineWidth = 2f // Set line width
@@ -82,13 +89,14 @@ fun updateChartData(
                 val modelEntries = ArrayList<Entry>()
 
                 // Special handling for AR prediction - start from index 100
-                val startIndex = if (modelName == "AR Prediction") dataFrame.rowsCount() else 0
+                val arPredictionName = context.getString(R.string.model_type_ar_prediction)
+                val startIndex = if (modelName == arPredictionName) dataFrame.rowsCount() else 0
 
                 for (i in 0 until modelDataFrame.rowsCount()) {
                     val value = modelDataFrame[modelColumnName][i].toString().toFloatOrNull() ?: 0f
 
                     // Adjust x-value for AR prediction
-                    val xValue = if (modelName == "AR Prediction") {
+                    val xValue = if (modelName == arPredictionName) {
                         (i + startIndex).toFloat()
                     } else {
                         i.toFloat()
@@ -108,7 +116,11 @@ fun updateChartData(
                 dataSets.add(modelDataSet)
             }
         } catch (e: Exception) {
-            android.util.Log.e("GraphPage", "Error adding model data", e)
+            android.util.Log.e(
+                context.getString(R.string.graph_page_log_tag),
+                context.getString(R.string.error_adding_model_data),
+                e
+            )
         }
     }
 

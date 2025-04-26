@@ -1,41 +1,134 @@
 <resources>
+        <!-- App General -->
         <string name="app_name">Finance Data Manager</string>
+        <string name="data_manager">Data Manager</string>
+
+        <!-- Authentication -->
+        <string name="login">Login</string>
         <string name="create_account">Create Account</string>
+        <string name="register">Register</string>
         <string name="email">Email</string>
-        <string name="invalid_email">Please enter a valid email address</string>
         <string name="password">Password</string>
         <string name="confirm_password">Confirm Password</string>
+        <string name="invalid_email">Please enter a valid email address</string>
         <string name="passwords_not_match">Passwords do not match</string>
+        <string name="invalid_credentials">Invalid email or password</string>
+        <string name="password_invalid">Invalid password format</string>
+        <string name="create_new_account">Create New Account</string>
         <string name="back_to_login">Back to Login</string>
+        <string name="account_created">Account created successfully</string>
+        <string name="account_created_message">Account created successfully. You can now log in.</string>
+        <string name="account_creation_failed">Account creation failed. Please try again.</string>
+
+        <!-- UI Elements -->
         <string name="back">Back</string>
+        <string name="back_button">← Back</string>
+        <string name="retry">Retry</string>
+        <string name="details">Details</string>
+        <string name="hide_password">Hide Password</string>
+        <string name="show_password">Show Password</string>
+
+        <!-- Icons -->
         <string name="icon_email">Email</string>
         <string name="icon_password">Password</string>
         <string name="icon_confirm_password">Confirm Password</string>
-        <string name="data_manager">Data Manager</string>
-        <string name="invalid_credentials">Invalid email or password</string>
-        <string name="login">Login</string>
-        <string name="create_new_account">Create New Account</string>
-        <!-- MainPage strings -->
+        <string name="alerts_icon_description">Alerts icon</string>
+        <string name="graph_icon_description">Graph icon</string>
+        <string name="logout_icon_description">Logout icon</string>
+
+        <!-- Navigation -->
         <string name="menu">Menu</string>
         <string name="choose_data">Choose Data</string>
         <string name="math_models">Math Models</string>
         <string name="settings">Settings</string>
         <string name="logout">Logout</string>
-        <string name="main">Not implemented yet %1$s</string>
         <string name="home">Home</string>
         <string name="graph">Graph</string>
+        <string name="alerts">Alerts</string>
+        <string name="main">Not implemented yet %1$s</string>
+
+        <!-- Data Visualization -->
         <string name="stock_data_title">%1$s Stock Data</string>
-        <string name="back_button">← Back</string>
         <string name="loading_stock_data">Loading %1$s data…</string>
         <string name="no_data_available">No data available</string>
-        <string name="retry">Retry</string>
+        <string name="no_data_for_graph">No data available for graph</string>
+        <string name="data_view_time">Time</string>
+        <string name="data_view_price">Price</string>
+        <string name="data_view_approximation">Approximation</string>
+        <string name="price_label">Price</string>
+        <string name="stock_data_for">Stock Data for %1$s</string>
+        <string name="last_updated">Last updated: %1$s</string>
+        <string name="refresh_prices">Refresh prices</string>
+        <string name="stock_actions">Stock Actions</string>
+        <string name="stock_performance_overview">Stock Performance Overview</string>
+
+        <!-- Table Column Names -->
         <string name="column_time">Time</string>
         <string name="column_price">Price</string>
-        <string name="register">Register</string>
-        <string name="account_created">Account created successfully</string>
-        <string name="hide_password">Hide Password</string>
-        <string name="show_password">Show Password</string>
-        <string name="account_created_message">Account created successfully. You can now log in.</string>
-        <string name="account_creation_failed">Account creation failed. Please try again.</string>
-        <string name="password_invalid">Invalid password format</string>
+        <string name="time_column">Time</string>
+        <string name="price_column">Price</string>
+        <string name="symbol_column">Symbol</string>
+        <string name="change_column">Change</string>
+
+        <!-- Graph Page -->
+        <string name="select_stock">Select Stock: %1$s</string>
+        <string name="calculating_model">Calculating %1$s model…</string>
+        <string name="graph_page_log_tag">GraphPage</string>
+        <string name="error_adding_model_data">Error adding model data</string>
+
+        <!-- Model Types -->
+        <string name="model_type_none">Raw Data</string>
+        <string name="model_type_approximation">Approximation</string>
+        <string name="model_type_moving_average">Moving Average</string>
+        <string name="model_type_ar_prediction">AR Prediction</string>
+
+        <!-- Model Column Names -->
+        <string name="model_column_approximation">Approximation</string>
+        <string name="model_column_ma_filtration">MaFiltration</string>
+        <string name="model_column_prediction">Prediction</string>
+        <string name="approximation_column">Approximation</string>
+        <string name="prediction_column">Prediction</string>
+        <string name="ma_filtration_column">MA Filtration</string>
+
+        <!-- Model Controls -->
+        <string name="degree_label">Degree: %1$d</string>
+        <string name="window_size_label">Window Size: %1$d</string>
+        <string name="order_label">Order: %1$d</string>
+        <string name="horizon_label">Horizon: %1$d</string>
+
+        <!-- Polynomial Approximation -->
+        <string name="polynomial_approximation_title">Polynomial Approximation</string>
+        <string name="polynomial_degree_format">Polynomial Degree: %1$d</string>
+        <string name="model_equation_label">Model Equation:</string>
+        <string name="coefficients_label">Coefficients:</string>
+        <string name="coefficient_format">a%1$d = %2$s</string>
+        <string name="approximation_label">Approximation</string>
+
+        <!-- AR Prediction Model -->
+        <string name="ar_prediction_model_title">AR Prediction Model</string>
+        <string name="ar_model_format">AR(%1$d) Model</string>
+        <string name="prediction_horizon_format">Prediction Horizon: %1$d points</string>
+        <string name="model_coefficients_label">Model Coefficients:</string>
+        <string name="intercept_format">Intercept: %1$s</string>
+        <string name="ar_coefficient_format">AR(%1$d): %2$s</string>
+        <string name="ar_prediction_label">AR Prediction</string>
+
+        <!-- Moving Average Filtration -->
+        <string name="ma_filtration_title">MA Filtration</string>
+        <string name="window_size_format">Window size: %1$d</string>
+        <string name="ma_filtration_label">MA Filtration</string>
+
+        <!-- Alerts -->
+        <string name="stock_price_alerts_title">Stock Price Alerts</string>
+        <string name="create_new_alert">Create New Alert</string>
+        <string name="price_not_available">Price N/A</string>
+        <string name="alert_price_label">Alert Price ($)</string>
+        <string name="add_alert">Add Alert</string>
+        <string name="your_alerts">Your Alerts</string>
+        <string name="clear_all">Clear All</string>
+        <string name="no_alerts_set">No alerts set</string>
+        <string name="alert_price_format">Alert: $%1$s</string>
+        <string name="current_price_format">Current: $%1$s</string>
+        <string name="delete_alert">Delete alert</string>
+        <string name="triggered_alerts">Triggered Alerts</string>
 </resources>

@@ -1,3 +1,7 @@
+/**
+ * This file contains composable functions for selector components in the graph page.
+ * It provides user interface elements for selecting stocks and analytical models.
+ */
 package com.example.datamanager.frontend.main_pages.graph_page
 
 import androidx.compose.foundation.horizontalScroll
@@ -7,7 +11,9 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.example.datamanager.R
 
 /**
  * Composable function to display a stock selector dropdown menu.
@@ -36,7 +42,7 @@ fun StockSelector(
                 onClick = { expandedStockMenu = true },
                 colors = ButtonDefaults.buttonColors(containerColor = DarkThemeColors.primary)
             ) {
-                Text("Select Stock: $selectedStock")
+                Text(stringResource(R.string.select_stock, selectedStock))
             }
 
             // Dropdown menu displaying the list of available stocks
@@ -89,7 +95,13 @@ fun ModelSelector(
                         DarkThemeColors.primary else DarkThemeColors.onBackground)
                 )
             ) {
-                Text(modelType.displayName) // Display the model type's name
+                val modelText = when(modelType) {
+                    ModelType.NONE -> stringResource(R.string.model_type_none)
+                    ModelType.APPROXIMATION -> stringResource(R.string.model_type_approximation)
+                    ModelType.MAFILTRATION -> stringResource(R.string.model_type_moving_average)
+                    ModelType.ARPREDICTION -> stringResource(R.string.model_type_ar_prediction)
+                }
+                Text(modelText)
             }
         }
     }

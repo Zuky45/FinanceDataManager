@@ -18,6 +18,8 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.datamanager.R
+import com.example.datamanager.backend.db_manager.auth.DBManager
+import com.example.datamanager.frontend.navigations.NavigationRoutes
 import com.example.datamanager.mid.main_pages.MainPageModelHandler
 import com.example.datamanager.mid.main_pages.StockAction
 import com.example.datamanager.mid.main_pages.model_handlers.StockModelHandler
@@ -74,29 +76,48 @@ fun MainPage(navController: NavController) {
                     // Navigation drawer item for viewing the graph
                     val viewGraph = stringResource(R.string.graph)
                     NavigationDrawerItem(
-                        icon = { Icon(Icons.Default.BarChart, null) },
+                        icon = { Icon(Icons.Default.BarChart, contentDescription = stringResource(R.string.graph_icon_description)) },
                         label = { Text(viewGraph) },
                         selected = selectedOption == viewGraph,
                         onClick = {
                             selectedOption = viewGraph
                             scope.launch {
                                 drawerState.close()
-                                navController.navigate("graph")
+                                navController.navigate(NavigationRoutes.GRAPH)
                             }
                         },
                         modifier = Modifier.padding(horizontal = 12.dp)
                     )
 
                     // Navigation drawer item for alerts
+                    val alerts = stringResource(R.string.alerts)
                     NavigationDrawerItem(
-                        icon = { Icon(Icons.Default.Notifications, null) },
-                        label = { Text("Alerts") },
-                        selected = selectedOption == "Alerts",
+                        icon = { Icon(Icons.Default.Notifications, contentDescription = stringResource(R.string.alerts_icon_description)) },
+                        label = { Text(alerts) },
+                        selected = selectedOption == alerts,
                         onClick = {
-                            selectedOption = "Alerts"
+                            selectedOption = alerts
                             scope.launch {
                                 drawerState.close()
-                                navController.navigate("alerts")
+                                navController.navigate(NavigationRoutes.ALERTS)
+                            }
+                        },
+                        modifier = Modifier.padding(horizontal = 12.dp)
+                    )
+
+                    val logout = stringResource(R.string.logout)
+                    NavigationDrawerItem(
+                        icon = { Icon(Icons.Default.Logout, contentDescription = stringResource(R.string.logout_icon_description)) },
+                        label = { Text(logout) },
+                        selected = selectedOption == logout,
+                        onClick = {
+                            selectedOption = logout
+                            scope.launch {
+                                drawerState.close()
+                                DBManager.getInstance().signOut()
+                                navController.navigate(NavigationRoutes.LOGIN)
+
+
                             }
                         },
                         modifier = Modifier.padding(horizontal = 12.dp)
@@ -115,7 +136,7 @@ fun MainPage(navController: NavController) {
                         },
                         actions = {
                             IconButton(onClick = { modelHandler.refreshPrices() }) {
-                                Icon(Icons.Default.Refresh, contentDescription = "Refresh prices")
+                                Icon(Icons.Default.Refresh, contentDescription = stringResource(R.string.refresh_prices))
                             }
                         },
                         colors = TopAppBarDefaults.topAppBarColors(
@@ -135,7 +156,7 @@ fun MainPage(navController: NavController) {
                     // Display the last refresh time
                     if (refreshTime.isNotEmpty()) {
                         Text(
-                            text = "Last updated: $refreshTime",
+                            text = stringResource(R.string.last_updated, refreshTime),
                             style = MaterialTheme.typography.bodySmall,
                             modifier = Modifier.fillMaxWidth(),
                             textAlign = TextAlign.End
@@ -153,7 +174,7 @@ fun MainPage(navController: NavController) {
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
-                                "Stock Actions",
+                                stringResource(R.string.stock_actions),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = customColors.onSurface
                             )
@@ -177,18 +198,18 @@ fun MainPage(navController: NavController) {
                                     horizontalArrangement = Arrangement.SpaceBetween
                                 ) {
                                     Text(
-                                        "Symbol",
+                                        stringResource(R.string.symbol_column),
                                         style = MaterialTheme.typography.labelMedium,
                                         modifier = Modifier.weight(1f)
                                     )
                                     Text(
-                                        "Price",
+                                        stringResource(R.string.price_column),
                                         style = MaterialTheme.typography.labelMedium,
                                         modifier = Modifier.weight(1f),
                                         textAlign = TextAlign.End
                                     )
                                     Text(
-                                        "Change",
+                                        stringResource(R.string.change_column),
                                         style = MaterialTheme.typography.labelMedium,
                                         modifier = Modifier.weight(1f),
                                         textAlign = TextAlign.End
@@ -245,7 +266,7 @@ fun MainPage(navController: NavController) {
                     ) {
                         Column(modifier = Modifier.padding(16.dp)) {
                             Text(
-                                "Stock Performance Overview",
+                                stringResource(R.string.stock_performance_overview),
                                 style = MaterialTheme.typography.titleMedium,
                                 color = customColors.onSurface
                             )
@@ -296,7 +317,7 @@ fun StockGraph(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = "No data available for graph",
+                text = stringResource(R.string.no_data_for_graph),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
             )

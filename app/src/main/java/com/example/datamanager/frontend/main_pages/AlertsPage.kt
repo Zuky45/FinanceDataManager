@@ -1,3 +1,8 @@
+/**
+ * This file contains the composable for the Alerts Page.
+ * It allows users to create, view, and manage stock price alerts,
+ * as well as view alerts that have been triggered.
+ */
 package com.example.datamanager.frontend.main_pages
 
 import androidx.compose.foundation.background
@@ -13,9 +18,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.datamanager.R
 import com.example.datamanager.frontend.main_pages.graph_page.DarkThemeColors
 import com.example.datamanager.mid.main_pages.AlertsModelHandler
 
@@ -63,12 +70,12 @@ fun AlertsPage(navController: NavController) {
             IconButton(onClick = {navController.popBackStack()}) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
-                    contentDescription = "Back",
+                    contentDescription = stringResource(R.string.back_button),
                     tint = DarkThemeColors.onBackground
                 )
             }
             Text(
-                text = "Stock Price Alerts",
+                text = stringResource(R.string.stock_price_alerts_title),
                 style = MaterialTheme.typography.headlineMedium,
                 color = DarkThemeColors.onBackground,
                 modifier = Modifier.padding(start = 8.dp, top = 16.dp, bottom = 16.dp)
@@ -88,7 +95,7 @@ fun AlertsPage(navController: NavController) {
                 modifier = Modifier.padding(16.dp)
             ) {
                 Text(
-                    text = "Create New Alert",
+                    text = stringResource(R.string.create_new_alert),
                     style = MaterialTheme.typography.titleLarge,
                     color = DarkThemeColors.onSurface,
                     modifier = Modifier.padding(bottom = 8.dp)
@@ -104,7 +111,7 @@ fun AlertsPage(navController: NavController) {
                         value = selectedStock,
                         onValueChange = {},
                         readOnly = true,
-                        label = { Text("Select Stock", color = DarkThemeColors.onSurface.copy(alpha = 0.7f)) },
+                        label = { Text(stringResource(R.string.select_stock), color = DarkThemeColors.onSurface.copy(alpha = 0.7f)) },
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                         colors = TextFieldDefaults.textFieldColors(
                             unfocusedTextColor = DarkThemeColors.onSurface,
@@ -128,7 +135,7 @@ fun AlertsPage(navController: NavController) {
                             DropdownMenuItem(
                                 text = {
                                     Text(
-                                        "$stock (${currentPrices[stock]?.let { "$$it" } ?: "Price N/A"})",
+                                        "$stock (${currentPrices[stock]?.let { "$$it" } ?: stringResource(R.string.price_not_available)})",
                                         color = DarkThemeColors.onSurface
                                     )
                                 },
@@ -147,7 +154,7 @@ fun AlertsPage(navController: NavController) {
                 TextField(
                     value = alertPrice,
                     onValueChange = { alertPrice = it },
-                    label = { Text("Alert Price ($)", color = DarkThemeColors.onSurface.copy(alpha = 0.7f)) },
+                    label = { Text(stringResource(R.string.alert_price_label), color = DarkThemeColors.onSurface.copy(alpha = 0.7f)) },
                     colors = TextFieldDefaults.textFieldColors(
                         unfocusedTextColor = DarkThemeColors.onSurface,
                         focusedTextColor = DarkThemeColors.onSurface,
@@ -179,7 +186,7 @@ fun AlertsPage(navController: NavController) {
                         contentColor = DarkThemeColors.onBackground
                     )
                 ) {
-                    Text("Add Alert")
+                    Text(stringResource(R.string.add_alert))
                 }
             }
         }
@@ -202,7 +209,7 @@ fun AlertsPage(navController: NavController) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Your Alerts",
+                        text = stringResource(R.string.your_alerts),
                         style = MaterialTheme.typography.titleLarge,
                         color = DarkThemeColors.onSurface,
                         modifier = Modifier.padding(bottom = 8.dp)
@@ -216,14 +223,14 @@ fun AlertsPage(navController: NavController) {
                             contentColor = DarkThemeColors.onBackground
                         )
                     ) {
-                        Text("Clear All")
+                        Text(stringResource(R.string.clear_all))
                     }
                 }
 
                 // Display a message if no alerts are set
                 if (alerts.isEmpty()) {
                     Text(
-                        text = "No alerts set",
+                        text = stringResource(R.string.no_alerts_set),
                         color = DarkThemeColors.onSurface.copy(alpha = 0.7f),
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
@@ -245,10 +252,12 @@ fun AlertsPage(navController: NavController) {
                                         color = DarkThemeColors.onSurface
                                     )
                                     Row {
-                                        Text("Alert: $${alert.price}", color = DarkThemeColors.onSurface.copy(alpha = 0.8f))
+                                        Text(stringResource(R.string.alert_price_format, alert.price),
+                                            color = DarkThemeColors.onSurface.copy(alpha = 0.8f))
                                         Spacer(modifier = Modifier.width(8.dp))
                                         currentPrices[alert.symbol]?.let {
-                                            Text("Current: $$it", color = DarkThemeColors.onSurface.copy(alpha = 0.8f))
+                                            Text(stringResource(R.string.current_price_format, it),
+                                                color = DarkThemeColors.onSurface.copy(alpha = 0.8f))
                                         }
                                     }
                                 }
@@ -257,7 +266,7 @@ fun AlertsPage(navController: NavController) {
                                 IconButton(onClick = { viewModel.deleteAlert(alert.symbol) }) {
                                     Icon(
                                         imageVector = Icons.Filled.Delete,
-                                        contentDescription = "Delete alert",
+                                        contentDescription = stringResource(R.string.delete_alert),
                                         tint = DarkThemeColors.error
                                     )
                                 }
@@ -281,7 +290,7 @@ fun AlertsPage(navController: NavController) {
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text(
-                        text = "Triggered Alerts",
+                        text = stringResource(R.string.triggered_alerts),
                         style = MaterialTheme.typography.titleLarge,
                         color = DarkThemeColors.onSurface,
                         modifier = Modifier.padding(bottom = 8.dp)

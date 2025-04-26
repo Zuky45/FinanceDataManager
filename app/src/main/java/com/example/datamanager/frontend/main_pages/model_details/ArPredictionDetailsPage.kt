@@ -1,3 +1,8 @@
+/**
+ * This file contains composable functions for the AR Prediction details page.
+ * It displays detailed information about the autoregressive prediction model,
+ * including coefficients, visualization chart, and prediction data table.
+ */
 package com.example.datamanager.frontend.main_pages.model_details
 
 import androidx.compose.foundation.background
@@ -9,11 +14,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
+import com.example.datamanager.R
 import com.example.datamanager.frontend.main_pages.graph_page.DarkThemeColors
 import com.example.datamanager.frontend.main_pages.graph_page.NoDataView
 import com.example.datamanager.mid.main_pages.model_handlers.ArPredictionModelHandler
@@ -49,10 +56,14 @@ fun ArPredictionDetailsPage(
         topBar = {
             // Top app bar with a title and back navigation
             SmallTopAppBar(
-                title = { Text("AR Prediction Model") },
+                title = { Text(stringResource(R.string.ar_prediction_model_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.back_button),
+                            tint = Color.White
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.smallTopAppBarColors(
@@ -114,7 +125,7 @@ private fun ArPredictionContent(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = "AR($order) Model",
+                    text = stringResource(R.string.ar_model_format, order),
                     style = MaterialTheme.typography.titleLarge,
                     color = DarkThemeColors.onSurface
                 )
@@ -122,7 +133,7 @@ private fun ArPredictionContent(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Prediction Horizon: $horizon points",
+                    text = stringResource(R.string.prediction_horizon_format, horizon),
                     style = MaterialTheme.typography.bodyMedium,
                     color = DarkThemeColors.onSurface
                 )
@@ -130,7 +141,7 @@ private fun ArPredictionContent(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Model Coefficients:",
+                    text = stringResource(R.string.model_coefficients_label),
                     style = MaterialTheme.typography.titleMedium,
                     color = DarkThemeColors.onSurface
                 )
@@ -139,7 +150,7 @@ private fun ArPredictionContent(
 
                 // Display intercept
                 Text(
-                    text = "Intercept: ${formatter.format(coefficients[0])}",
+                    text = stringResource(R.string.intercept_format, formatter.format(coefficients[0])),
                     style = MaterialTheme.typography.bodySmall,
                     color = DarkThemeColors.onSurface
                 )
@@ -147,7 +158,7 @@ private fun ArPredictionContent(
                 // Display AR coefficients
                 for (i in 1 until coefficients.size) {
                     Text(
-                        text = "AR($i): ${formatter.format(coefficients[i])}",
+                        text = stringResource(R.string.ar_coefficient_format, i, formatter.format(coefficients[i])),
                         style = MaterialTheme.typography.bodySmall,
                         color = DarkThemeColors.onSurface
                     )
@@ -202,14 +213,14 @@ private fun ArPredictionContent(
                         .padding(8.dp)
                 ) {
                     Text(
-                        text = "Time",
+                        text = stringResource(R.string.time_column),
                         modifier = Modifier.weight(1f),
                         textAlign = TextAlign.Center,
                         color = DarkThemeColors.onSurface,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Prediction",
+                        text = stringResource(R.string.prediction_column),
                         modifier = Modifier.weight(1f),
                         textAlign = TextAlign.Center,
                         color = DarkThemeColors.onSurface,
@@ -253,6 +264,7 @@ private fun ArPredictionContent(
  */
 private fun updateArPredictionChart(chart: LineChart, dataFrame: DataFrame<*>) {
     val entries = ArrayList<Entry>()
+    val context = chart.context
 
     for (i in 0 until dataFrame.rowsCount()) {
         val x = dataFrame["Time"][i]?.toString()?.toFloatOrNull() ?: i.toFloat()
@@ -260,7 +272,7 @@ private fun updateArPredictionChart(chart: LineChart, dataFrame: DataFrame<*>) {
         entries.add(Entry(x, y))
     }
 
-    val dataSet = LineDataSet(entries, "AR Prediction").apply {
+    val dataSet = LineDataSet(entries, context.getString(R.string.ar_prediction_label)).apply {
         color = AndroidColor.rgb(0, 191, 255) // Deep sky blue
         lineWidth = 2.5f
         setDrawCircles(false)

@@ -1,3 +1,8 @@
+/**
+ * This file contains composable functions for the polynomial approximation details page.
+ * It displays detailed information about the approximation model, including coefficients,
+ * equation visualization, and data table.
+ */
 package com.example.datamanager.frontend.main_pages.model_details
 
 import androidx.compose.foundation.background
@@ -9,11 +14,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.navigation.NavController
+import com.example.datamanager.R
 import com.example.datamanager.frontend.main_pages.graph_page.DarkThemeColors
 import com.example.datamanager.frontend.main_pages.graph_page.NoDataView
 import com.example.datamanager.mid.main_pages.model_handlers.ApproximationModelHandler
@@ -24,14 +31,14 @@ import com.github.mikephil.charting.data.LineDataSet
 import org.jetbrains.kotlinx.dataframe.DataFrame
 import android.graphics.Color as AndroidColor
 
+/**
+ * Composable function to display the details page for polynomial approximation.
+ *
+ * @param navController The NavController used for navigation.
+ * @param approximationHandler The handler responsible for managing the approximation model data.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-        /**
-         * Composable function to display the details page for polynomial approximation.
-         *
-         * @param navController The NavController used for navigation.
-         * @param approximationHandler The handler responsible for managing the approximation model data.
-         */
 fun ApproximationDetailsPage(
     navController: NavController,
     approximationHandler: ApproximationModelHandler
@@ -45,10 +52,14 @@ fun ApproximationDetailsPage(
         topBar = {
             // Top app bar with a title and back navigation
             SmallTopAppBar(
-                title = { Text("Polynomial Approximation") },
+                title = { Text(stringResource(R.string.polynomial_approximation_title)) },
                 navigationIcon = {
                     IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back", tint = Color.White)
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.back_button),
+                            tint = Color.White
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.smallTopAppBarColors(
@@ -79,7 +90,6 @@ fun ApproximationDetailsPage(
     }
 }
 
-@Composable
 /**
  * Composable function to display the content of the approximation details page.
  *
@@ -87,6 +97,7 @@ fun ApproximationDetailsPage(
  * @param coefficients The coefficients of the polynomial equation.
  * @param dataFrame The data frame containing the approximation data.
  */
+@Composable
 private fun ApproximationContent(
     degree: Int,
     coefficients: DoubleArray,
@@ -100,7 +111,7 @@ private fun ApproximationContent(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = "Polynomial Degree: $degree",
+                    text = stringResource(R.string.polynomial_degree_format, degree),
                     style = MaterialTheme.typography.titleMedium,
                     color = DarkThemeColors.onSurface
                 )
@@ -108,7 +119,7 @@ private fun ApproximationContent(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Model Equation:",
+                    text = stringResource(R.string.model_equation_label),
                     style = MaterialTheme.typography.bodyMedium,
                     color = DarkThemeColors.onSurface
                 )
@@ -123,14 +134,14 @@ private fun ApproximationContent(
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Coefficients:",
+                    text = stringResource(R.string.coefficients_label),
                     style = MaterialTheme.typography.bodyMedium,
                     color = DarkThemeColors.onSurface
                 )
 
                 coefficients.forEachIndexed { index, value ->
                     Text(
-                        text = "a$index = ${String.format("%.6f", value)}",
+                        text = stringResource(R.string.coefficient_format, index, String.format("%.6f", value)),
                         style = MaterialTheme.typography.bodySmall,
                         color = DarkThemeColors.onSurface
                     )
@@ -185,14 +196,14 @@ private fun ApproximationContent(
                         .padding(8.dp)
                 ) {
                     Text(
-                        text = "Time",
+                        text = stringResource(R.string.time_column),
                         modifier = Modifier.weight(1f),
                         textAlign = TextAlign.Center,
                         color = DarkThemeColors.onSurface,
                         fontWeight = FontWeight.Bold
                     )
                     Text(
-                        text = "Approximation",
+                        text = stringResource(R.string.approximation_column),
                         modifier = Modifier.weight(1f),
                         textAlign = TextAlign.Center,
                         color = DarkThemeColors.onSurface,
@@ -236,6 +247,7 @@ private fun ApproximationContent(
  */
 private fun updateApproximationChart(chart: LineChart, dataFrame: DataFrame<*>) {
     val entries = ArrayList<Entry>()
+    val context = chart.context
 
     for (i in 0 until dataFrame.rowsCount()) {
         val x = dataFrame["Time"][i]?.toString()?.toFloatOrNull() ?: i.toFloat()
@@ -243,7 +255,7 @@ private fun updateApproximationChart(chart: LineChart, dataFrame: DataFrame<*>) 
         entries.add(Entry(x, y))
     }
 
-    val dataSet = LineDataSet(entries, "Approximation").apply {
+    val dataSet = LineDataSet(entries, context.getString(R.string.approximation_label)).apply {
         color = AndroidColor.rgb(255, 165, 0)
         lineWidth = 2.5f
         setDrawCircles(false)

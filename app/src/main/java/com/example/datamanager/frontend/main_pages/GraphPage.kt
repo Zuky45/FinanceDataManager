@@ -1,3 +1,9 @@
+/**
+ * This file contains the composable function for the Graph Page.
+ * It provides visualization of stock data and various analytical models,
+ * including polynomial approximation, moving average filtration, and
+ * autoregressive prediction.
+ */
 package com.example.datamanager.frontend.main_pages
 
 import androidx.compose.foundation.background
@@ -5,11 +11,13 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.datamanager.R
 import com.example.datamanager.mid.main_pages.model_handlers.ApproximationModelHandler
 import com.example.datamanager.mid.main_pages.model_handlers.MaFiltrationModelHandler
 import com.example.datamanager.mid.main_pages.model_handlers.StockModelHandler
@@ -22,8 +30,6 @@ import com.example.datamanager.mid.main_pages.model_handlers.ArPredictionModelHa
  * @param navController The NavController used for navigation between screens.
  * @param stockSymbol The default stock symbol to display (default is "AAPL").
  * @param stockViewModel The ViewModel responsible for managing stock data.
- * @param approximationViewModel The ViewModel responsible for managing approximation model data.
- * @param maFiltrationViewModel The ViewModel responsible for managing moving average filtration model data.
  */
 @Composable
 fun GraphPage(
@@ -81,7 +87,7 @@ fun GraphPage(
 
         // Header
         Text(
-            text = "Stock Data for $selectedStock",
+            text = stringResource(R.string.stock_data_for, selectedStock),
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             color = DarkThemeColors.onBackground,
@@ -128,7 +134,7 @@ fun GraphPage(
                 if (selectedModel != ModelType.NONE && modelState.isLoading) {
                     ModelLoadingView(modelState.displayName)
                 } else if (selectedModel != ModelType.NONE && modelState.error != null) {
-                    ErrorView(modelState.error!!) {
+                    ErrorView(modelState.error) {
                         reloadModelData(selectedModel, selectedStock, currentModelHandler)
                     }
                 } else {
@@ -153,6 +159,7 @@ fun GraphPage(
  * @param modelType The type of the model (e.g., APPROXIMATION, MAFILTRATION).
  * @param approximationViewModel The ViewModel responsible for managing approximation model data.
  * @param maFiltrationViewModel The ViewModel responsible for managing moving average filtration model data.
+ * @param arPredictionViewModel The ViewModel responsible for managing autoregressive prediction model data.
  * @return A ModelUIState object containing the data, loading state, error, column name, and display name for the model.
  */
 @Composable

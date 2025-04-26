@@ -15,10 +15,16 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.datamanager.R
+import com.example.datamanager.frontend.navigations.NavigationRoutes
 import com.example.datamanager.mid.login_pages.NewAccountModelHandler
 
 /**
  * Composable function that represents the "Create New Account" screen.
+ *
+ * This screen provides input fields for the user to enter their email, password,
+ * and confirm the password. It also includes a button to toggle password visibility,
+ * a button to create the account, and a navigation button to return to the login screen.
+ * The screen handles validation, error states, and account creation logic.
  *
  * @param navController The navigation controller used to navigate between screens.
  * @param modifier The modifier to be applied to the root composable.
@@ -156,7 +162,7 @@ fun NewAccountPage(navController: NavController, modifier: Modifier = Modifier) 
 
                 // Button to navigate back to the login screen
                 TextButton(
-                    onClick = { navController.navigate("login") },
+                    onClick = { navController.navigate(NavigationRoutes.LOGIN) },
                     modifier = Modifier.padding(top = 16.dp),
                     colors = ButtonDefaults.textButtonColors(
                         contentColor = MaterialTheme.colorScheme.primary

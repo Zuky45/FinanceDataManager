@@ -1,3 +1,7 @@
+/**
+ * This file contains composable functions for displaying different state views in the graph page.
+ * It provides UI components for loading, error, and empty states for both stock data and models.
+ */
 package com.example.datamanager.frontend.main_pages.graph_page
 
 import androidx.compose.foundation.layout.*
@@ -5,8 +9,10 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.datamanager.R
 
 /**
  * Composable function to display a loading view with a progress indicator and a message.
@@ -22,7 +28,7 @@ fun LoadingView(stockSymbol: String) {
             Spacer(modifier = Modifier.height(16.dp))
             // Text message indicating the stock being loaded
             Text(
-                text = "Loading data for $stockSymbol...",
+                text = stringResource(R.string.loading_stock_data, stockSymbol),
                 color = DarkThemeColors.onBackground
             )
         }
@@ -43,7 +49,7 @@ fun ModelLoadingView(modelName: String) {
             Spacer(modifier = Modifier.height(16.dp))
             // Text message indicating the model being calculated
             Text(
-                text = "Calculating $modelName model...",
+                text = stringResource(R.string.calculating_model, modelName),
                 color = DarkThemeColors.onBackground
             )
         }
@@ -58,7 +64,7 @@ fun NoDataView() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
         // Text message indicating no data is available
         Text(
-            text = "No data available",
+            text = stringResource(R.string.no_data_available),
             color = DarkThemeColors.error
         )
     }
@@ -86,7 +92,7 @@ fun ErrorView(errorMessage: String, onRetry: () -> Unit) {
                 onClick = onRetry,
                 colors = ButtonDefaults.buttonColors(containerColor = DarkThemeColors.primary)
             ) {
-                Text("Retry")
+                Text(stringResource(R.string.retry))
             }
         }
     }
