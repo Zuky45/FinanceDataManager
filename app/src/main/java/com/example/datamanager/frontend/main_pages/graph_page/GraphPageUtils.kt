@@ -1,3 +1,7 @@
+// Documentation partially generated
+// Refactoring done with copilot
+// Some functionality implemented with use of copilot
+// @ author: Michal Poprac
 /**
  * This file contains utility functions for the graph page.
  * It provides methods for model data reloading, chart data updates, and data frame operations.
@@ -111,7 +115,7 @@ fun updateChartData(
                     lineWidth = 2f // Set line width
                     setDrawCircles(false) // Disable circles on data points
                     setDrawValues(false) // Disable value labels
-                    mode = LineDataSet.Mode.HORIZONTAL_BEZIER // Use cubic bezier for smooth lines
+                    mode = LineDataSet.Mode.CUBIC_BEZIER // Use cubic bezier for smooth lines
                 }
                 dataSets.add(modelDataSet)
             }

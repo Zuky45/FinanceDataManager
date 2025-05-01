@@ -1,3 +1,4 @@
+// @ author: Michal Poprac
 package com.example.datamanager.frontend.login_pages
 
 import androidx.compose.material3.darkColorScheme

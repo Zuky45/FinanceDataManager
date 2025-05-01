@@ -1,3 +1,7 @@
+// Documentation partially generated
+// Refactoring done with copilot
+// Some functionality implemented with use of copilot
+// @ author: Michal Poprac
 /**
  * This file contains composable functions for displaying different state views in the graph page.
  * It provides UI components for loading, error, and empty states for both stock data and models.

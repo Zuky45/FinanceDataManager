@@ -1,3 +1,7 @@
+// Documentation partially generated
+// Refactoring done with copilot
+// Some functionality implemented with use of copilot
+// @ author: Michal Poprac
 package com.example.datamanager.frontend.main_pages
 
 import android.util.Log

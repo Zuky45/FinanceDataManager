@@ -1,3 +1,7 @@
+// Documentation partially generated
+// Refactoring done with copilot
+// Some functionality implemented with use of copilot
+// @ author: Michal Poprac
 /**
  * This file contains the composable for the Alerts Page.
  * It allows users to create, view, and manage stock price alerts,

@@ -1,7 +1,9 @@
-package com.example.datamanager.backend.db_manager.db
+// Documentation partially generated
+// Refactoring done with copilot
+// @ author: Michal Poprac
+package com.example.datamanager.backend.db_manager.stock_data
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query

@@ -1,3 +1,7 @@
+// Documentation partially generated
+// Refactoring done with copilot
+// Some functionality implemented with use of copilot
+// @ author: Michal Poprac
 /**
  * This file contains composable functions for the polynomial approximation details page.
  * It displays detailed information about the approximation model, including coefficients,

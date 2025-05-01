@@ -1,3 +1,8 @@
+// Documentation partially generated
+// Refactoring done with copilot
+// Some functionality implemented with use of copilot
+// @ author: Michal Poprac
+
 /**
  * This file contains composable functions for data visualization in the graph page.
  * It provides components for displaying stock data in both chart and table formats,

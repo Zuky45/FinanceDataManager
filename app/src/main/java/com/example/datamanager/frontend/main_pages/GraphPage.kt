@@ -1,3 +1,7 @@
+// Documentation partially generated
+// Refactoring done with copilot
+// Some functionality implemented with use of copilot
+// @ author: Michal Poprac
 /**
  * This file contains the composable function for the Graph Page.
  * It provides visualization of stock data and various analytical models,

@@ -1,4 +1,7 @@
-package com.example.datamanager.backend.db_manager.db
+// Documentation partially generated
+// Refactoring done with copilot
+// @ author: Michal Poprac
+package com.example.datamanager.backend.db_manager.stock_data
 
 import android.content.Context
 import android.util.Log
@@ -7,7 +10,6 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.jetbrains.kotlinx.dataframe.api.last
 import java.util.Date
 
 /**

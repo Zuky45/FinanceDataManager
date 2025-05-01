@@ -1,3 +1,6 @@
+// Documentation partially generated
+// Refactoring done with copilot
+// @ author: Michal Poprac
 package com.example.datamanager.backend.alerts_manager
 
 import android.content.Context

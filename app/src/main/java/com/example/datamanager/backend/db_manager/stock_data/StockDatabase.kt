@@ -1,4 +1,7 @@
-package com.example.datamanager.backend.db_manager.db
+// Documentation partially generated
+// Refactoring done with copilot
+// @ author: Michal Poprac
+package com.example.datamanager.backend.db_manager.stock_data
 
 import android.content.Context
 import androidx.room.Database

@@ -1,14 +1,16 @@
+// Documentation partially generated
+// Refactoring done with copilot
+// Some functionality implemented with use of copilot
+// @ author: Michal Poprac
 package com.example.datamanager.mid.main_pages
 
 import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.datamanager.backend.api_manager.ApiManager
 import com.example.datamanager.backend.api_manager.StockEntry
-import com.example.datamanager.backend.db_manager.db.StockDBManager
-import com.example.datamanager.backend.db_manager.db.StockDatabase
+import com.example.datamanager.backend.db_manager.stock_data.StockDBManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

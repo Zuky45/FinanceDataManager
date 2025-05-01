@@ -1,3 +1,6 @@
+// Documentation partially generated
+// Refactoring done with copilot
+// @ author: Michal Poprac
 package com.example.datamanager.backend.db_manager.auth
 
 import com.google.firebase.auth.FirebaseAuth
