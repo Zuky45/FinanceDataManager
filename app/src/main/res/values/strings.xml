@@ -13,7 +13,7 @@
         <string name="invalid_email">Please enter a valid email address</string>
         <string name="passwords_not_match">Passwords do not match</string>
         <string name="invalid_credentials">Invalid email or password</string>
-        <string name="password_invalid">Invalid password format</string>
+        <string name="password_invalid">Password must be at least 8 characters and contain at least 1 number</string>
         <string name="create_new_account">Create New Account</string>
         <string name="back_to_login">Back to Login</string>
         <string name="account_created">Account created successfully</string>
